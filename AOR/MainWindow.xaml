@@ -7,6 +7,7 @@
         mc:Ignorable="d"
         Title="Automatic Pipe Organ Registrant" Height="675" Width="1200">
     <Grid>
-        
+        <TextBlock Name="Text1" Text="Hello World" FontSize="50" VerticalAlignment="Center" HorizontalAlignment="Center"></TextBlock>
+        <Button Name="Button" Content="Press" Width="125" Height="45" Margin="0,150,0,0" FontSize="25" FontFamily="Comic Sans MS" Click="Button_OnClick" ></Button>
     </Grid>
 </Window>
