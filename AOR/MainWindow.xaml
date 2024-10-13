@@ -4,10 +4,29 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AOR"
+        xmlns:dropDown="clr-namespace:AOR.View.Controls"
         mc:Ignorable="d"
         Title="Automatic Pipe Organ Registrant" Height="675" Width="1200">
-    <Grid>
-        <TextBlock Name="Text1" Text="Hello World" FontSize="50" VerticalAlignment="Center" HorizontalAlignment="Center"></TextBlock>
-        <Button Name="Button" Content="Press" Width="125" Height="45" Margin="0,150,0,0" FontSize="25" FontFamily="Comic Sans MS" Click="Button_OnClick" ></Button>
+    <Grid Background="Bisque">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="0.25*"/>
+            <RowDefinition Height="0.25*"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/> 
+            <ColumnDefinition Width="2*"/> 
+        </Grid.ColumnDefinitions>
+        
+        <dropDown:DropDown Grid.Row="0" Grid.Column="2" x:Name= "InputDeviceDropDown"></dropDown:DropDown>
+        <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" Text="Input Device Name:"/>
+        <TextBlock Grid.Row="0" Grid.Column="1" Name="InputName" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{Binding InputDeviceName, UpdateSourceTrigger=PropertyChanged}"></TextBlock>
+        
+        <dropDown:DropDownOutput Grid.Row="1" Grid.Column="2" x:Name= "OutputDeviceDropDown"></dropDown:DropDownOutput>
+        <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" Text="Output Device Name:"/>
+        <TextBlock Grid.Row="1" Grid.Column="1" Name="OutputName" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{Binding OutputDeviceName, UpdateSourceTrigger=PropertyChanged}"></TextBlock>
+
     </Grid>
 </Window>
+ 

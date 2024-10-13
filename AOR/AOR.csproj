@@ -54,6 +54,14 @@
             <Generator>MSBuild:Compile</Generator>
             <SubType>Designer</SubType>
         </ApplicationDefinition>
+        <Compile Include="ModelView\Bindings.cs" />
+        <Compile Include="Model\DeviceController.cs" />
+        <Compile Include="View\Controls\DropDown.xaml.cs">
+          <DependentUpon>DropDown.xaml</DependentUpon>
+        </Compile>
+        <Compile Include="View\Controls\DropDownOutput.xaml.cs">
+          <DependentUpon>DropDownOutput.xaml</DependentUpon>
+        </Compile>
         <Page Include="MainWindow.xaml">
             <Generator>MSBuild:Compile</Generator>
             <SubType>Designer</SubType>
@@ -66,6 +74,8 @@
             <DependentUpon>MainWindow.xaml</DependentUpon>
             <SubType>Code</SubType>
         </Compile>
+        <Page Include="View\Controls\DropDown.xaml" />
+        <Page Include="View\Controls\DropDownOutput.xaml" />
     </ItemGroup>
     <ItemGroup>
         <Compile Include="Properties\AssemblyInfo.cs">
