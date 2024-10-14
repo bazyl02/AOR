@@ -9,8 +9,12 @@ namespace AOR.ModelView
     {
         //Singleton setup
         private static Bindings _instance = null;
-        
-        private Bindings(){}
+
+        private Bindings()
+        {
+            DeviceController = new DeviceController();
+            SongManager = new SongManager();
+        }
         public static Bindings GetInstance()
         {
             return _instance ?? (_instance = new Bindings());
@@ -18,7 +22,7 @@ namespace AOR.ModelView
         
         //Global controllers
         public DeviceController DeviceController;
-        
+        public SongManager SongManager;
         
         
         //Data stored for bindings
