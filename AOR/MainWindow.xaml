@@ -7,21 +7,24 @@
         xmlns:customControls="clr-namespace:AOR.View.Controls"
         mc:Ignorable="d"
         Title="Automatic Pipe Organ Registrant" Height="675" Width="1200">
-    <Grid Background="Bisque">
+    <Grid Background="Bisque" Margin="0 0 0 0 ">
         <Grid.RowDefinitions>
             <RowDefinition Height="0.25*"/>
             <RowDefinition Height="0.25*"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-            <ColumnDefinition/> 
-            <ColumnDefinition Width="2*"/> 
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*"/> 
+            <ColumnDefinition Width="1.8*"/> 
+            <ColumnDefinition Width="1.5*"/>
+            <ColumnDefinition Width="1.5*"/>
         </Grid.ColumnDefinitions>
         
         <customControls:DropDown Grid.Row="0" Grid.Column="2" x:Name= "InputDeviceDropDown"></customControls:DropDown>
         <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" Text="Input Device Name:"/>
         <TextBlock Grid.Row="0" Grid.Column="1" Name="InputName" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{Binding InputDeviceName, UpdateSourceTrigger=PropertyChanged}"></TextBlock>
+        <customControls:SimulatedInputFileDropDown  Grid.Row="0" Grid.Column="3" ></customControls:SimulatedInputFileDropDown>
         
         <customControls:DropDownOutput Grid.Row="1" Grid.Column="2" x:Name= "OutputDeviceDropDown"></customControls:DropDownOutput>
         <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" Text="Output Device Name:"/>

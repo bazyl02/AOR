@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.Windows.Controls;
+using AOR.Model;
 using AOR.ModelView;
 using Melanchall.DryWetMidi.Multimedia;
 
@@ -14,13 +16,13 @@ namespace AOR.View.Controls
 
         private void InputComboBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            InputDevice device = (InputDevice)e.AddedItems[0];
-            Bindings.GetInstance().InputDeviceName = device.Name;
+            string device = (string)e.AddedItems[0];
+            Bindings.GetInstance().InputDeviceName = device;
         }
 
         private void InputComboBox_OnDropDownOpened(object sender, EventArgs e)
         {
-            ComboBox.ItemsSource = InputDevice.GetAll();
+            ComboBox.ItemsSource = DeviceController.GetAllInputDeviceNames();
         }
     }
 }

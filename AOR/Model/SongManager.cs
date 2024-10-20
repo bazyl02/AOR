@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using Melanchall.DryWetMidi.Core;
 
 namespace AOR.Model
@@ -7,16 +10,49 @@ namespace AOR.Model
     {
         public SongManager()
         {
-            Songs = new List<MidiFile>();
+            Pieces = new List<PieceData>();
         }
         
-        public List<MidiFile> Songs;
+        public List<PieceData> Pieces;
 
         public void LoadSong(string path)
         {
             MidiFile song = MidiFile.Read(path);
-            if(!Songs.Contains(song)) Songs.Add(song);
+            PieceData newPiece = new PieceData(song, path);
+            if (!Pieces.Contains(newPiece))
+            {
+                Pieces.Add(newPiece);
+            }
         }
         
+        public class PieceData
+        {
+            public MidiFile MidiFile;
+            public string Path;
+            public string Name;
+
+            public PieceData(MidiFile file, string path)
+            {
+                MidiFile = file;
+                Path = path;
+                Name = System.IO.Path.GetFileNameWithoutExtension(Path);
+            }
+
+            public override bool Equals(object obj)
+            {
+                if (obj == null) return false;
+                if (GetType() != obj.GetType()) return false;
+                PieceData data = (PieceData)obj;
+                return Path.Equals(data.Path);
+            }
+
+            public override int GetHashCode()
+            {
+                int hash = 97;
+                hash = (hash * 17) + MidiFile.GetHashCode();
+                hash = (hash * 17) + Name.GetHashCode();
+                return hash;
+            }
+        }
     }
 }

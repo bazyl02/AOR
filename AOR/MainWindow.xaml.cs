@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Windows;
 using AOR.ModelView;
 using AOR.Model;
@@ -11,8 +12,6 @@ namespace AOR
         private DeviceController DeviceController;
 
         private Bindings _bindings;
-
-        private static Playback _playback;
         
         public MainWindow()
         {
@@ -23,8 +22,13 @@ namespace AOR
 
         private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
         {
-            _playback = Bindings.GetInstance().SongManager.Songs.Last().GetPlayback(Bindings.GetInstance().DeviceController.OutputDevice);
-            _playback?.Start();
+            //Bindings.GetInstance().DeviceController.SetSimulatedInput(Bindings.GetInstance().SongManager.Pieces.Last().MidiFile.GetPlayback(Bindings.GetInstance().DeviceController.OutputDevice));
+            foreach (var song in Bindings.GetInstance().SongManager.Pieces)
+            {
+                Console.WriteLine(song.Name);
+            }
+            
         }
+        
     }
 }

@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using AOR.Model;
+using Melanchall.DryWetMidi.Multimedia;
 
 namespace AOR.ModelView
 {
@@ -26,6 +28,19 @@ namespace AOR.ModelView
         
         
         //Data stored for bindings
+
+        private bool _fromFile = false;
+
+        public bool FromFile
+        {
+            get => _fromFile;
+            set
+            {
+                _fromFile = value;
+                OnPropertyChanged();
+            }
+        }
+        
         private string _inputDeviceName;
 
         public string InputDeviceName
