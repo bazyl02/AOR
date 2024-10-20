@@ -53,6 +53,11 @@ namespace AOR.Model
                 hash = (hash * 17) + Name.GetHashCode();
                 return hash;
             }
+
+            public override string ToString()
+            {
+                return Name;
+            }
         }
     }
 }

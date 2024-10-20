@@ -1,9 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using AOR.Model;
-using Melanchall.DryWetMidi.Multimedia;
 
 namespace AOR.ModelView
 {

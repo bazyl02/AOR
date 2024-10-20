@@ -66,6 +66,9 @@
         <Compile Include="View\Controls\OpenMidiFileDialog.xaml.cs">
           <DependentUpon>OpenMidiFileDialog.xaml</DependentUpon>
         </Compile>
+        <Compile Include="View\Controls\PlaybackControls.xaml.cs">
+          <DependentUpon>PlaybackControls.xaml</DependentUpon>
+        </Compile>
         <Compile Include="View\Controls\SimulatedInputFileDropDown.xaml.cs">
           <DependentUpon>SimulatedInputFileDropDown.xaml</DependentUpon>
         </Compile>
@@ -84,6 +87,7 @@
         <Page Include="View\Controls\DropDown.xaml" />
         <Page Include="View\Controls\DropDownOutput.xaml" />
         <Page Include="View\Controls\OpenMidiFileDialog.xaml" />
+        <Page Include="View\Controls\PlaybackControls.xaml" />
         <Page Include="View\Controls\SimulatedInputFileDropDown.xaml" />
     </ItemGroup>
     <ItemGroup>

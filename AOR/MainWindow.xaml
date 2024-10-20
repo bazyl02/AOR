@@ -24,7 +24,8 @@
         <customControls:DropDown Grid.Row="0" Grid.Column="2" x:Name= "InputDeviceDropDown"></customControls:DropDown>
         <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" Text="Input Device Name:"/>
         <TextBlock Grid.Row="0" Grid.Column="1" Name="InputName" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{Binding InputDeviceName, UpdateSourceTrigger=PropertyChanged}"></TextBlock>
-        <customControls:SimulatedInputFileDropDown  Grid.Row="0" Grid.Column="3" ></customControls:SimulatedInputFileDropDown>
+        <customControls:SimulatedInputFileDropDown  Grid.Row="0" Grid.Column="3" x:Name= "SimulatedInputFileDropDown" ></customControls:SimulatedInputFileDropDown>
+        <customControls:PlaybackControls Grid.Column="4" Grid.Row="0"></customControls:PlaybackControls>
         
         <customControls:DropDownOutput Grid.Row="1" Grid.Column="2" x:Name= "OutputDeviceDropDown"></customControls:DropDownOutput>
         <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" Text="Output Device Name:"/>

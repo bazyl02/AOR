@@ -16,8 +16,7 @@ namespace AOR.View.Controls
         private void ComboBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             SongManager.PieceData piece = (SongManager.PieceData)e.AddedItems[0];
-            Console.WriteLine(piece.Name);
-            //Bindings.GetInstance().InputDeviceName = device;
+            Bindings.GetInstance().DeviceController.SetTrackForSimulatedInput(piece.MidiFile);
         }
 
         private void ComboBox_OnDropDownOpened(object sender, EventArgs e)

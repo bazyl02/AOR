@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Melanchall.DryWetMidi.Core;
 using Melanchall.DryWetMidi.Multimedia;
 
 namespace AOR.Model
@@ -41,15 +42,12 @@ namespace AOR.Model
             
             OutputDevice.EventSent += OnEventSent;
         }
-
-        public void SetSimulatedInput(Playback playback)
+        
+        public void SetTrackForSimulatedInput(MidiFile track)
         {
-            SimulatedInput?.Stop();
             SimulatedInput?.Dispose();
-
-            SimulatedInput = playback;
+            SimulatedInput = track.GetPlayback();
             SimulatedInput.EventPlayed += OnEventPlayed;
-            SimulatedInput?.Start();
         }
         
         
