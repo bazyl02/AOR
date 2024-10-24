@@ -13,6 +13,7 @@ namespace AOR.ModelView
         {
             DeviceController = new DeviceController();
             SongManager = new SongManager();
+            InputBuffer = new InputBuffer();
         }
         public static Bindings GetInstance()
         {
@@ -22,6 +23,7 @@ namespace AOR.ModelView
         //Global controllers
         public DeviceController DeviceController;
         public SongManager SongManager;
+        public InputBuffer InputBuffer;
         
         
         //Data stored for bindings

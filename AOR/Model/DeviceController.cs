@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
+using AOR.ModelView;
 using Melanchall.DryWetMidi.Core;
 using Melanchall.DryWetMidi.Multimedia;
 
@@ -50,16 +53,42 @@ namespace AOR.Model
             SimulatedInput.EventPlayed += OnEventPlayed;
         }
         
-        
         private void OnEventPlayed(object sender, MidiEventPlayedEventArgs args)
         {
             Playback playback = (Playback)sender;
-            Console.WriteLine("Event received from Midi File at " + DateTime.Now + ": " + args.Event);
+            MidiEventType type = args.Event.EventType;
+            switch (type)
+            {
+                case MidiEventType.NoteOn:
+                    NoteOnEvent noteOnEvent = (NoteOnEvent)args.Event;
+                    //Console.WriteLine("Event received from Midi File at " + DateTime.Now + " tone: " + noteOnEvent.NoteNumber);
+                    Bindings.GetInstance().InputBuffer.BufferSimulatedInput(true,noteOnEvent.NoteNumber, noteOnEvent.DeltaTime);
+                    break;
+                case MidiEventType.NoteOff:
+                    NoteOffEvent noteOffEvent = (NoteOffEvent)args.Event;
+                    //Console.WriteLine("Event received from Midi File at " + DateTime.Now + " tone: " + noteOffEvent.NoteNumber);
+                    Bindings.GetInstance().InputBuffer.BufferSimulatedInput(false,noteOffEvent.NoteNumber, noteOffEvent.DeltaTime);
+                    break;
+            }
         }
+        
         private void OnEventReceived(object sender, MidiEventReceivedEventArgs e)
         {
             var midiDevice = (MidiDevice)sender;
-            Console.WriteLine("Event received from " + midiDevice.Name + " at " + DateTime.Now + ": " + e.Event);
+            MidiEventType type = e.Event.EventType;
+            switch (type)
+            {
+                case MidiEventType.NoteOn:
+                    NoteOnEvent noteOnEvent = (NoteOnEvent)e.Event;
+                    //Console.WriteLine("Note On event received from " + midiDevice.Name + " at " + DateTime.Now + " tone: " + noteOnEvent.NoteNumber);
+                    Bindings.GetInstance().InputBuffer.BufferUserInput(true,noteOnEvent.NoteNumber);
+                    break;
+                case MidiEventType.NoteOff:
+                    NoteOffEvent noteOffEvent = (NoteOffEvent)e.Event;
+                    //Console.WriteLine("Note Off event received from " + midiDevice.Name + " at " + DateTime.Now + " tone: " + noteOffEvent.NoteNumber);
+                    Bindings.GetInstance().InputBuffer.BufferUserInput(false,noteOffEvent.NoteNumber);
+                    break;
+            }
         }
 
         private void OnEventSent(object sender, MidiEventSentEventArgs e)
@@ -78,6 +107,5 @@ namespace AOR.Model
             output.Add("From File");
             return output;
         }
-        
     }
 }
