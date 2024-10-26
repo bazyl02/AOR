@@ -27,6 +27,7 @@ namespace AOR.ModelView
         public DeviceController DeviceController;
         public SongManager SongManager;
         public InputBuffer InputBuffer;
+        public PieceBuffer PieceBuffer;
 
         public SongList SongList;
         

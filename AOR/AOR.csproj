@@ -64,6 +64,7 @@
         <Compile Include="Model\DeviceController.cs" />
         <Compile Include="Model\InputBuffer.cs" />
         <Compile Include="Model\MidiEventData.cs" />
+        <Compile Include="Model\PieceBuffer.cs" />
         <Compile Include="Model\SongManager.cs" />
         <Compile Include="View\Controls\BottomBar.xaml.cs">
           <DependentUpon>BottomBar.xaml</DependentUpon>
