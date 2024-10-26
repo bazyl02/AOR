@@ -7,9 +7,9 @@ namespace AOR.Model
     {
         public const int UserBufferSize = 40;
         
-        public List<int> UserBuffer = new List<int>(UserBufferSize);
+        public List<MidiEventData> UserBuffer = new List<MidiEventData>(UserBufferSize);
         
-        private void BufferInput(int value)
+        private void BufferInput(MidiEventData value)
         {
              while (UserBuffer.Count >= UserBufferSize)
              {
@@ -20,41 +20,35 @@ namespace AOR.Model
         
         public void BufferUserInput(bool on ,byte tone)
         {
-            int bufferedValue = 0;
+            //TODO: Calculate and pass delta time and global time
+            MidiEventData eventData = new MidiEventData(on,tone,0,0);
+            
             if (on)
             {
                 Console.WriteLine("Received Note On event. Tone: " + tone);
-                bufferedValue += 1;
+                
             }
             else
             {
                 Console.WriteLine("Received Note Off event. Tone: " + tone);
             }
-
-            bufferedValue <<= 7;
-            bufferedValue += tone;
-            Console.WriteLine(Convert.ToString(bufferedValue,2).PadLeft(16,'0'));
-            BufferInput(bufferedValue);
+            BufferInput(eventData);
         }
 
         public void BufferSimulatedInput(bool on, byte tone, long deltaTime)
         {
-            int bufferedValue = 0;
+            //TODO: Calculate and pass global time
+            MidiEventData eventData = new MidiEventData(on,tone,deltaTime,0);
             if (on)
             {
                 Console.WriteLine("Received Note On event. Tone: " + tone + " | Delta Time: " + deltaTime);
-                bufferedValue += 1;
+                
             }
             else
             {
                 Console.WriteLine("Received Note Off event. Tone: " + tone + " | Delta Time: " + deltaTime);
             }
-            bufferedValue <<= 7;
-            bufferedValue += tone;
-            bufferedValue <<= 16;
-            bufferedValue += (int)deltaTime;
-            Console.WriteLine(Convert.ToString(bufferedValue,2).PadLeft(24,'0'));
-            BufferInput(bufferedValue);
+            BufferInput(eventData);
         }
     }
 }
