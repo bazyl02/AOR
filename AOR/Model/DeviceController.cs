@@ -14,9 +14,7 @@ namespace AOR.Model
         public OutputDevice OutputDevice = null;
 
         public Playback SimulatedInput = null;
-
-        public bool FromFile = false;
-
+        
         public void SetInputDevice(string name)
         {
             if (InputDevice != null)
@@ -25,11 +23,11 @@ namespace AOR.Model
             }
             if (name.Equals("From File"))
             {
-                FromFile = true;
+                Bindings.GetInstance().FromFile = true;
                 //SetSimulatedInput();
                 return;
             }
-            FromFile = false;
+            Bindings.GetInstance().FromFile = false;
             InputDevice = InputDevice.GetByName(name);
             InputDevice.StartEventsListening();
             InputDevice.EventReceived += OnEventReceived;

@@ -1,6 +1,9 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using AOR.Model;
+using AOR.View.Controls;
+using System.Drawing;
+using System.Windows;
 
 namespace AOR.ModelView
 {
@@ -24,10 +27,11 @@ namespace AOR.ModelView
         public DeviceController DeviceController;
         public SongManager SongManager;
         public InputBuffer InputBuffer;
+
+        public SongList SongList;
         
         
         //Data stored for bindings
-
         private bool _fromFile = false;
 
         public bool FromFile
@@ -36,12 +40,36 @@ namespace AOR.ModelView
             set
             {
                 _fromFile = value;
+                //OnPropertyChanged();
+                FromFileVisible = _fromFile ? Visibility.Visible : Visibility.Hidden;
+            }
+        }
+
+        private Visibility _fromFileVisible = Visibility.Hidden;
+
+        public Visibility FromFileVisible
+        {
+            get => _fromFileVisible;
+            set
+            {
+                _fromFileVisible = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private SongManager.PieceData _selectedPiece;
+
+        public SongManager.PieceData SelectedPiece
+        {
+            get => _selectedPiece;
+            set
+            {
+                _selectedPiece = value;
                 OnPropertyChanged();
             }
         }
         
         private string _inputDeviceName;
-
         public string InputDeviceName
         {
             get => _inputDeviceName;

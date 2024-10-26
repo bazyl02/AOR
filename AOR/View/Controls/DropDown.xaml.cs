@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.ObjectModel;
 using System.Windows.Controls;
 using AOR.Model;
 using AOR.ModelView;
-using Melanchall.DryWetMidi.Multimedia;
 
 namespace AOR.View.Controls
 {

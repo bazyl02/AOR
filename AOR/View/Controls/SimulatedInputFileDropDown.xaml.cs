@@ -21,6 +21,7 @@ namespace AOR.View.Controls
 
         private void ComboBox_OnDropDownOpened(object sender, EventArgs e)
         {
+            ComboBox.ItemsSource = null;
             ComboBox.ItemsSource = Bindings.GetInstance().SongManager.Pieces;
         }
     }

@@ -29,13 +29,13 @@ namespace AOR.Model
         {
             public MidiFile MidiFile;
             public string Path;
-            public string Name;
+            public string SongName;
 
             public PieceData(MidiFile file, string path)
             {
                 MidiFile = file;
                 Path = path;
-                Name = System.IO.Path.GetFileNameWithoutExtension(Path);
+                SongName = System.IO.Path.GetFileNameWithoutExtension(Path);
             }
 
             public override bool Equals(object obj)
@@ -50,13 +50,13 @@ namespace AOR.Model
             {
                 int hash = 97;
                 hash = (hash * 17) + MidiFile.GetHashCode();
-                hash = (hash * 17) + Name.GetHashCode();
+                hash = (hash * 17) + SongName.GetHashCode();
                 return hash;
             }
 
             public override string ToString()
             {
-                return Name;
+                return SongName;
             }
         }
     }

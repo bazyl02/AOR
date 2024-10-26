@@ -15,13 +15,18 @@ namespace AOR.View.Controls
         private void OpenFile_OnClick(object sender, RoutedEventArgs e)
         {
             OpenFileDialog fileDialog = new OpenFileDialog();
+            fileDialog.Multiselect = true;
             fileDialog.Filter = "MIDI file | *.mid";
             fileDialog.Title = "Select a MIDI file to open";
             bool? success = fileDialog.ShowDialog();
             if (success == true)
             {
-                string path = fileDialog.FileName;
-                Bindings.GetInstance().SongManager.LoadSong(path);
+                foreach (var fileName in fileDialog.FileNames)
+                {
+                    Bindings.GetInstance().SongManager.LoadSong(fileName);
+                }
+                //string path = fileDialog.FileName;
+                Bindings.GetInstance().SongList.UpdateSongList(Bindings.GetInstance().SongManager.Pieces); 
             }
         }
     }

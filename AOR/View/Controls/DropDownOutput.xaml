@@ -7,12 +7,12 @@
              mc:Ignorable="d"
              d:DesignHeight="50" d:DesignWidth="300">
     <Grid>
-        <ComboBox Name = "ComboBox" SelectionChanged="OutputComboBox_OnSelectionChanged" DropDownOpened="OutputComboBox_OnDropDownOpened">
+        <ComboBox HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Name = "ComboBox" SelectionChanged="OutputComboBox_OnSelectionChanged" DropDownOpened="OutputComboBox_OnDropDownOpened">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="30" Text="{Binding Name}"></TextBlock>
-                    </StackPanel>
+                    <Grid Width="Auto" Height="Auto">
+                        <TextBlock TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" Text="{Binding Name}"></TextBlock>
+                    </Grid>
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>

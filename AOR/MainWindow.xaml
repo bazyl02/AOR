@@ -7,34 +7,29 @@
         xmlns:customControls="clr-namespace:AOR.View.Controls"
         mc:Ignorable="d"
         Title="Automatic Pipe Organ Registrant" Height="675" Width="1200">
+    
     <Grid Background="Bisque" Margin="0 0 0 0 ">
         <Grid.RowDefinitions>
-            <RowDefinition Height="0.25*"/>
-            <RowDefinition Height="0.25*"/>
-            <RowDefinition/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="0.12*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*"/>
-            <ColumnDefinition Width="1*"/> 
-            <ColumnDefinition Width="1.8*"/> 
-            <ColumnDefinition Width="1.5*"/>
-            <ColumnDefinition Width="1.5*"/>
+            <ColumnDefinition Width="0.25*"/> 
         </Grid.ColumnDefinitions>
         
-        <customControls:DropDown Grid.Row="0" Grid.Column="2" x:Name= "InputDeviceDropDown"></customControls:DropDown>
-        <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" Text="Input Device Name:"/>
-        <TextBlock Grid.Row="0" Grid.Column="1" Name="InputName" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{Binding InputDeviceName, UpdateSourceTrigger=PropertyChanged}"></TextBlock>
-        <customControls:SimulatedInputFileDropDown  Grid.Row="0" Grid.Column="3" x:Name= "SimulatedInputFileDropDown" ></customControls:SimulatedInputFileDropDown>
-        <customControls:PlaybackControls Grid.Column="4" Grid.Row="0"></customControls:PlaybackControls>
+        <Image  Name="Test"></Image>
+        <customControls:SongList x:Name="MainList" Grid.Row="0" Grid.Column="0"/>
         
-        <customControls:DropDownOutput Grid.Row="1" Grid.Column="2" x:Name= "OutputDeviceDropDown"></customControls:DropDownOutput>
-        <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" Text="Output Device Name:"/>
-        <TextBlock Grid.Row="1" Grid.Column="1" Name="OutputName" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{Binding OutputDeviceName, UpdateSourceTrigger=PropertyChanged}"></TextBlock>
-
+        <Rectangle Grid.Row="0" Grid.Column="0" Fill="Black" VerticalAlignment="Stretch" HorizontalAlignment="Right" Width="2"></Rectangle>
+        <Rectangle Grid.Row="0" Grid.Column="0" Fill="Black" VerticalAlignment="Stretch" HorizontalAlignment="Left" Width="2"></Rectangle>
+        <Rectangle Grid.Row="0" Grid.Column="0" Fill="Black" VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="2"></Rectangle>
+        <Rectangle Grid.Row="0" Grid.Column="0" Fill="Black" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Height="2"></Rectangle>
+        <customControls:DeviceBar Grid.Row="0" Grid.Column="1" Grid.RowSpan="2"></customControls:DeviceBar>
+        <customControls:BottomBar Grid.Row="1" Grid.Column="0"></customControls:BottomBar>
         
-        <Button Grid.Row="2" Grid.Column="1" Click="ButtonBase_OnClick"></Button>
         
-        <customControls:OpenMidiFileDialog Grid.Row="2" Grid.Column="2" x:Name="FileDialog"/>
     </Grid>
+    
 </Window>
  
