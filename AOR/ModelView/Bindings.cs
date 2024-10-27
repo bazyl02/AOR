@@ -2,7 +2,6 @@
 using System.Runtime.CompilerServices;
 using AOR.Model;
 using AOR.View.Controls;
-using System.Drawing;
 using System.Windows;
 
 namespace AOR.ModelView
@@ -30,6 +29,9 @@ namespace AOR.ModelView
         public PieceBuffer PieceBuffer;
 
         public SongList SongList;
+
+        public int TimeDivision = 96;
+        public long Tempo = 500000;
         
         
         //Data stored for bindings

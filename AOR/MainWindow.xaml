@@ -8,6 +8,8 @@
         mc:Ignorable="d"
         Title="Automatic Pipe Organ Registrant" Height="675" Width="1200">
     
+    
+    
     <Grid Background="Bisque" Margin="0 0 0 0 ">
         <Grid.RowDefinitions>
             <RowDefinition Height="1*"/>
@@ -18,7 +20,7 @@
             <ColumnDefinition Width="0.25*"/> 
         </Grid.ColumnDefinitions>
         
-        <Image  Name="Test"></Image>
+        
         <customControls:SongList x:Name="MainList" Grid.Row="0" Grid.Column="0"/>
         
         <Rectangle Grid.Row="0" Grid.Column="0" Fill="Black" VerticalAlignment="Stretch" HorizontalAlignment="Right" Width="2"></Rectangle>
@@ -28,8 +30,9 @@
         <customControls:DeviceBar Grid.Row="0" Grid.Column="1" Grid.RowSpan="2"></customControls:DeviceBar>
         <customControls:BottomBar Grid.Row="1" Grid.Column="0"></customControls:BottomBar>
         
-        
+        <Button Grid.Row="1" Grid.Column="1" Click="ButtonBase_OnClick"></Button>
     </Grid>
+    
     
 </Window>
  

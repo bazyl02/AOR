@@ -41,6 +41,7 @@
         <Reference Include="System"/>
         <Reference Include="System.Core"/>
         <Reference Include="System.Data"/>
+        <Reference Include="System.Drawing" />
         <Reference Include="System.Drawing.Common, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
           <HintPath>..\packages\System.Drawing.Common.8.0.10\lib\net462\System.Drawing.Common.dll</HintPath>
         </Reference>
@@ -62,10 +63,14 @@
         </ApplicationDefinition>
         <Compile Include="ModelView\Bindings.cs" />
         <Compile Include="Model\DeviceController.cs" />
+        <Compile Include="Model\Helpers.cs" />
         <Compile Include="Model\InputBuffer.cs" />
         <Compile Include="Model\MidiEventData.cs" />
         <Compile Include="Model\PieceBuffer.cs" />
         <Compile Include="Model\SongManager.cs" />
+        <Compile Include="SheetWindow.xaml.cs">
+          <DependentUpon>SheetWindow.xaml</DependentUpon>
+        </Compile>
         <Compile Include="View\Controls\BottomBar.xaml.cs">
           <DependentUpon>BottomBar.xaml</DependentUpon>
         </Compile>
@@ -102,6 +107,7 @@
             <DependentUpon>MainWindow.xaml</DependentUpon>
             <SubType>Code</SubType>
         </Compile>
+        <Page Include="SheetWindow.xaml" />
         <Page Include="View\Controls\BottomBar.xaml" />
         <Page Include="View\Controls\DeviceBar.xaml" />
         <Page Include="View\Controls\DropDown.xaml" />

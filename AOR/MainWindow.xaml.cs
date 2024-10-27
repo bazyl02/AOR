@@ -27,14 +27,9 @@ namespace AOR
 
         private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
         {
-            //Bindings.GetInstance().DeviceController.SetSimulatedInput(Bindings.GetInstance().SongManager.Pieces.Last().MidiFile.GetPlayback(Bindings.GetInstance().DeviceController.OutputDevice));
-            foreach (var song in Bindings.GetInstance().SongManager.Pieces)
-            {
-                Console.WriteLine(song.SongName);
-            }
-
+            SheetWindow win2 = new SheetWindow();
+            win2.Show();
             
-            //Test.Source = source;
         }
 
         

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
+﻿using System.Collections.Generic;
 using AOR.ModelView;
 using Melanchall.DryWetMidi.Core;
 
@@ -23,7 +20,7 @@ namespace AOR.Model
             if (!Pieces.Contains(newPiece))
             {
                 Pieces.Add(newPiece);
-                Bindings.GetInstance().PieceBuffer = new PieceBuffer(newPiece.MidiFile);
+                //Bindings.GetInstance().PieceBuffer = new PieceBuffer(newPiece.MidiFile);
             }
         }
         
