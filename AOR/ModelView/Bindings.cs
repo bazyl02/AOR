@@ -1,8 +1,10 @@
 ﻿using System.ComponentModel;
+using System.Drawing;
 using System.Runtime.CompilerServices;
 using AOR.Model;
 using AOR.View.Controls;
 using System.Windows;
+using System.Windows.Media.Imaging;
 
 namespace AOR.ModelView
 {
@@ -94,6 +96,18 @@ namespace AOR.ModelView
                 _outputDeviceName = value;
                 OnPropertyChanged();
                 DeviceController.SetOutputDevice(_outputDeviceName);
+            }
+        }
+
+        private BitmapSource _currentSheet;
+
+        public BitmapSource CurrentSheet
+        {
+            get => _currentSheet;
+            set
+            {
+                _currentSheet = value;
+                OnPropertyChanged();
             }
         }
         
