@@ -61,12 +61,12 @@ namespace AOR.Model
             MidiEventData eventData = new MidiEventData(on,tone,ticks,globalTime);
             if (on)
             {
-                Console.WriteLine("Received Note On event. Tone: " + tone + " | Delta Time: " + deltaTime);
+                Console.WriteLine("Received Note On event. Tone: " + tone + " | Delta Time: " + ticks);
                 
             }
             else
             {
-                Console.WriteLine("Received Note Off event. Tone: " + tone + " | Delta Time: " + deltaTime);
+                Console.WriteLine("Received Note Off event. Tone: " + tone + " | Delta Time: " + ticks);
             }
             BufferInput(eventData);
         }
