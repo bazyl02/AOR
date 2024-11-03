@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Melanchall.DryWetMidi.Core;
 using Melanchall.DryWetMidi.Interaction;
 
@@ -28,6 +29,14 @@ namespace AOR.Model
             }
 
             TempoMap tempoMap = file.ManageTempoMap().TempoMap;
+
+            long globalTrackTime = 0;
+            long globalRegisterTime = 0;
+            long globalPageTime = 0;
+
+            long globalMidiTrackTime = 0;
+            long globalMidiRegisterTime = 0;
+            long globalMidiPageTime = 0;
             
             //Iterate through all chunks
             foreach (var chunk in chunks)
@@ -35,73 +44,78 @@ namespace AOR.Model
                 //If it's a track chunk
                 if (chunk.ChunkId == "MTrk")
                 {
-                    //Cast it to track chunk
                     TrackChunk trackChunk = (TrackChunk)chunk;
-                    //Get channel(s) used by chunk
-                    var trackChannel = Helpers.GetChannels(trackChunk.GetChannels());
-                    //If it's more then one abort
-                    if (trackChannel.Count > 1) throw new InvalidDataException("Track can't use multiple channels");
-                    //If it's zero it's metadata chunk
-                    if (trackChannel.Count == 0) continue;
-                    //Read track channel number
-                    byte channel = trackChannel[0];
-                    //Get track's events
                     var events = trackChunk.Events;
-
-                    //If it's track with the smallest channel number it's melody track
-                    if (channel == fileChannels[0])
+                    foreach (var evnt in events)
                     {
-                        //Count time since the beginning of the track
-                        long globalTime = 0;
-                        long globalMidiTime = 0;
-                        //Iterate through all track's events
-                        foreach (var ev in events)
+                        switch (evnt.EventType)
                         {
-                            //If it's NoteOn event
-                            if (ev.EventType == MidiEventType.NoteOn)
+                            case MidiEventType.NoteOn:
                             {
-                                //Cast top NoteOn
-                                NoteOnEvent onEvent = (NoteOnEvent)ev;
-                                //Calculate global midi time
-                                globalMidiTime += onEvent.DeltaTime;
-                                //Get tempo value in this event's time
-                                long tempo = tempoMap.GetTempoAtTime(new MidiTimeSpan(globalMidiTime)).MicrosecondsPerQuarterNote;
-                                //Calculate local time
-                                double divider = (tempo / (division * 1.0d)) / InputBuffer.TickResolution * 1.0d;
-                                long localTime = (long)(onEvent.DeltaTime * divider);
-                                //Calculate global real time
-                                globalTime += localTime;
-                                //Add tto buffer
-                                MelodyBuffer.Add(new MidiEventData(true,onEvent.NoteNumber,localTime,globalTime));
-                            } 
-                            else if (ev.EventType == MidiEventType.NoteOff)
-                            {
-                                //Cast top NoteOff
-                                NoteOffEvent offEvent = (NoteOffEvent)ev;
-                                //Calculate global midi time
-                                globalMidiTime += offEvent.DeltaTime;
-                                //Get tempo value in this event's time
-                                long tempo = tempoMap.GetTempoAtTime(new MidiTimeSpan(globalMidiTime)).MicrosecondsPerQuarterNote;
-                                //Calculate local time
-                                double divider = (tempo / (division * 1.0d)) / InputBuffer.TickResolution * 1.0d;
-                                long localTime = (long)(offEvent.DeltaTime * divider);
-                                //Calculate global real time
-                                globalTime += localTime;
-                                //Add tto buffer
-                                MelodyBuffer.Add(new MidiEventData(false,offEvent.NoteNumber,localTime,globalTime));
+                                NoteOnEvent onEvent = (NoteOnEvent)evnt;
+                                //Melody channel
+                                if (onEvent.Channel == fileChannels[0])
+                                {
+                                    globalMidiTrackTime += onEvent.DeltaTime;
+                                    long tempo = tempoMap.GetTempoAtTime(new MidiTimeSpan(globalMidiTrackTime)).MicrosecondsPerQuarterNote;
+                                    double divider = (tempo / (division * 1.0d)) / InputBuffer.TickResolution * 1.0d;
+                                    long localTime = (long)(onEvent.DeltaTime * divider);
+                                    
+                                    globalTrackTime += localTime;
+                                    MelodyBuffer.Add(new MidiEventData(true,onEvent.NoteNumber,localTime,globalTrackTime));
+                                }
+                                //Register channel
+                                else if (onEvent.Channel == fileChannels[1])
+                                {
+                                    
+                                }
+                                //Page channel
+                                else if (onEvent.Channel == fileChannels[2])
+                                {
+                                    
+                                }
+                                break;
                             }
+                            case MidiEventType.NoteOff:
+                            {
+                                NoteOffEvent offEvent = (NoteOffEvent)evnt;
+                                //Melody channel
+                                if (offEvent.Channel == fileChannels[0])
+                                {
+                                    globalMidiTrackTime += offEvent.DeltaTime;
+                                    long tempo = tempoMap.GetTempoAtTime(new MidiTimeSpan(globalMidiTrackTime)).MicrosecondsPerQuarterNote;
+                                    double divider = (tempo / (division * 1.0d)) / InputBuffer.TickResolution * 1.0d;
+                                    long localTime = (long)(offEvent.DeltaTime * divider);
+                                    
+                                    globalTrackTime += localTime;
+                                    MelodyBuffer.Add(new MidiEventData(false,offEvent.NoteNumber,localTime,globalTrackTime));
+                                }
+                                //Register channel
+                                else if (offEvent.Channel == fileChannels[1])
+                                {
+                                    
+                                }
+                                //Page channel
+                                else if (offEvent.Channel == fileChannels[2])
+                                {
+                                    globalMidiPageTime += offEvent.DeltaTime;
+                                    long tempo = tempoMap.GetTempoAtTime(new MidiTimeSpan(globalMidiPageTime)).MicrosecondsPerQuarterNote;
+                                    double divider = (tempo / (division * 1.0d)) / InputBuffer.TickResolution * 1.0d;
+                                    long localTime = (long)(offEvent.DeltaTime * divider);
+                                    
+                                    globalPageTime += localTime;
+                                    MelodyBuffer.Add(new MidiEventData(false,offEvent.NoteNumber,localTime,globalTrackTime));
+                                }
+                                break;
+                            }
+                            case MidiEventType.ProgramChange:
+                            {
+                                ProgramChangeEvent prEvent = (ProgramChangeEvent)evnt;
+                                break;
+                            }
+                            
                         }
-                    } 
-                    //else if (channel == fileChannels[1])
-                    {
-                        
                     }
-                    //else if (channel == fileChannels[2])
-                    {
-                        
-                    }
-                    
-                    
                 }
                 else
                 {

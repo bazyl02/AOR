@@ -20,7 +20,7 @@ namespace AOR.Model
             if (!Pieces.Contains(newPiece))
             {
                 Pieces.Add(newPiece);
-                //Bindings.GetInstance().PieceBuffer = new PieceBuffer(newPiece.MidiFile);
+                Bindings.GetInstance().PieceBuffer = new PieceBuffer(newPiece.MidiFile);
             }
         }
         
