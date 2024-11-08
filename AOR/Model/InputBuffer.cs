@@ -18,23 +18,27 @@ namespace AOR.Model
         private Stopwatch _stopwatch = new Stopwatch();
         private long _previousGlobalTime = 0;
         
-        private void BufferInput(byte tone, uint timestamp)
+        private void BufferInput(byte tone, uint timestamp, bool noteOn)
         {
              bool result = _notesInProgress.TryGetValue(tone, out NoteLine line);
              if (result)
              {
                  line.EndTime = timestamp;
                  _notesInProgress.Remove(tone);
+                 EndTimestamp = timestamp;
              }
              else
              {
-                 NoteLine newNoteLine = new NoteLine(tone, timestamp, 0);
-                 if (UserBuffer.Count >= UserBufferSize) UserBuffer.RemoveAt(0);
-                 UserBuffer.Add(newNoteLine);
-                 StartTimestamp = UserBuffer[0].StartTime;
-                 EndTimestamp = UserBuffer[UserBuffer.Count - 1].EndTime;
-                 _notesInProgress.Add(tone, newNoteLine);
+                 if (noteOn)
+                 {
+                     NoteLine newNoteLine = new NoteLine(tone, timestamp, 0);
+                     if (UserBuffer.Count >= UserBufferSize) UserBuffer.RemoveAt(0);
+                     UserBuffer.Add(newNoteLine);
+                     StartTimestamp = UserBuffer[0].StartTime;
+                     _notesInProgress.Add(tone, newNoteLine);
+                 }
              }
+             Console.WriteLine(StartTimestamp + " | " + EndTimestamp + " | " + UserBuffer.Count);
         }
         
         public void BufferUserInput(bool on ,byte tone)
@@ -50,7 +54,7 @@ namespace AOR.Model
             {
                 Console.WriteLine("Received Note Off event. Tone: " + tone + " | DeltaTime: " + ticks);
             }
-            BufferInput(tone, (uint)ticks);
+            BufferInput(tone, (uint)ticks, on);
         }
 
         public void BufferSimulatedInput(bool on, byte tone, long deltaTime)
@@ -66,15 +70,21 @@ namespace AOR.Model
             {
                 Console.WriteLine("Received Note Off event. Tone: " + tone + " | Delta Time: " + ticks);
             }
-            BufferInput(tone,(uint)ticks);
+            BufferInput(tone,(uint)ticks,on);
         }
 
 
         //Clears any previously buffered data
         public void Clear()
         {
+            
+            StartTimestamp = 0;
+            EndTimestamp = 0;
             UserBuffer.Clear();
+            _notesInProgress.Clear();
             _stopwatch.Reset();
+            _stopwatch.Start();
+            Console.WriteLine(_stopwatch.IsRunning);
             _previousGlobalTime = 0;
         }
     }

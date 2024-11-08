@@ -17,6 +17,7 @@ namespace AOR.View.Controls
             SheetWindow win2 = new SheetWindow();
             win2.Show();
             Bindings.GetInstance().ProcessSelectedPiece();
+            Bindings.GetInstance().InputBuffer.Clear();
         }
     }
 }
