@@ -66,6 +66,7 @@
         <Compile Include="Model\Helpers.cs" />
         <Compile Include="Model\InputBuffer.cs" />
         <Compile Include="Model\MidiEventData.cs" />
+        <Compile Include="Model\NoteLine.cs" />
         <Compile Include="Model\PieceBuffer.cs" />
         <Compile Include="Model\SongManager.cs" />
         <Compile Include="SheetWindow.xaml.cs">

@@ -9,33 +9,38 @@ namespace AOR.Model
         public const int UserBufferSize = 40;
         public const long TickResolution = 1000;
         
-        public List<MidiEventData> UserBuffer = new List<MidiEventData>(UserBufferSize);
+        public List<NoteLine> UserBuffer = new List<NoteLine>(UserBufferSize);
+        private Dictionary<byte, NoteLine> _notesInProgress = new Dictionary<byte, NoteLine>();
 
+        public uint StartTimestamp = 0;
+        public uint EndTimestamp = 0;
+        
         private Stopwatch _stopwatch = new Stopwatch();
         private long _previousGlobalTime = 0;
         
-        private void BufferInput(MidiEventData value)
+        private void BufferInput(byte tone, uint timestamp)
         {
-             while (UserBuffer.Count >= UserBufferSize)
+             bool result = _notesInProgress.TryGetValue(tone, out NoteLine line);
+             if (result)
              {
-                 UserBuffer.RemoveAt(0);
+                 line.EndTime = timestamp;
+                 _notesInProgress.Remove(tone);
              }
-             UserBuffer.Add(value);
+             else
+             {
+                 NoteLine newNoteLine = new NoteLine(tone, timestamp, 0);
+                 if (UserBuffer.Count >= UserBufferSize) UserBuffer.RemoveAt(0);
+                 UserBuffer.Add(newNoteLine);
+                 StartTimestamp = UserBuffer[0].StartTime;
+                 EndTimestamp = UserBuffer[UserBuffer.Count - 1].EndTime;
+                 _notesInProgress.Add(tone, newNoteLine);
+             }
         }
         
         public void BufferUserInput(bool on ,byte tone)
         {
             long ticks = _stopwatch.ElapsedTicks;
-            _stopwatch.Restart();
-
             ticks /= Stopwatch.Frequency / TickResolution;
-            
-            //TODO: Calculate delta time
-            
-            MidiEventData eventData = new MidiEventData(on,tone,ticks,0);
-            
-            Console.WriteLine(Stopwatch.IsHighResolution + " | " + Stopwatch.Frequency);
-            
             if (on)
             {
                 Console.WriteLine("Received Note On event. Tone: " + tone + " | DeltaTime: " + ticks);
@@ -45,20 +50,13 @@ namespace AOR.Model
             {
                 Console.WriteLine("Received Note Off event. Tone: " + tone + " | DeltaTime: " + ticks);
             }
-            BufferInput(eventData);
+            BufferInput(tone, (uint)ticks);
         }
 
         public void BufferSimulatedInput(bool on, byte tone, long deltaTime)
         {
             long ticks = _stopwatch.ElapsedTicks;
-            _stopwatch.Restart();
-            
             ticks /= Stopwatch.Frequency / TickResolution;
-
-            long globalTime = _previousGlobalTime + ticks;
-            _previousGlobalTime = globalTime;
-            
-            MidiEventData eventData = new MidiEventData(on,tone,ticks,globalTime);
             if (on)
             {
                 Console.WriteLine("Received Note On event. Tone: " + tone + " | Delta Time: " + ticks);
@@ -68,7 +66,7 @@ namespace AOR.Model
             {
                 Console.WriteLine("Received Note Off event. Tone: " + tone + " | Delta Time: " + ticks);
             }
-            BufferInput(eventData);
+            BufferInput(tone,(uint)ticks);
         }
 
 
