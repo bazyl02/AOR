@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using AOR.ModelView;
 
 namespace AOR.Model
 {
     public class InputBuffer
     {
-        public const int UserBufferSize = 40;
+        public const int UserBufferSize = 20;
         public const long TickResolution = 1000;
         
         public List<NoteLine> UserBuffer = new List<NoteLine>(UserBufferSize);
@@ -26,6 +27,8 @@ namespace AOR.Model
                  line.EndTime = timestamp;
                  _notesInProgress.Remove(tone);
                  EndTimestamp = timestamp;
+                 //TODO: Remove later
+                 Console.WriteLine(Bindings.GetInstance().Algorithm.Run());
              }
              else
              {
@@ -38,7 +41,6 @@ namespace AOR.Model
                      _notesInProgress.Add(tone, newNoteLine);
                  }
              }
-             Console.WriteLine(StartTimestamp + " | " + EndTimestamp + " | " + UserBuffer.Count);
         }
         
         public void BufferUserInput(bool on ,byte tone)

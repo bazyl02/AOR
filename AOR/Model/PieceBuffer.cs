@@ -12,7 +12,6 @@ namespace AOR.Model
         
         public List<MidiEventData> RegistrantsChangesBuffer = new List<MidiEventData>();
         public List<MidiEventData> PageChangesBuffer = new List<MidiEventData>();
-
         
         private void AddToMelodyBuffer(byte tone, uint timestamp)
         {
