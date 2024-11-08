@@ -11,5 +11,12 @@ namespace AOR.View.Controls
         {
             InitializeComponent();
         }
+
+        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
+        {
+            SheetWindow win2 = new SheetWindow();
+            win2.Show();
+            Bindings.GetInstance().ProcessSelectedPiece();
+        }
     }
 }

@@ -4,16 +4,24 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:local="clr-namespace:AOR"
+        xmlns:controls="clr-namespace:AOR.View.Controls"
         mc:Ignorable="d" 
         Title="SheetWindow" Height="850" Width="1600">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="0.05*"/>
             <RowDefinition/>
+            
+            
         </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0.75*"/>
+            <ColumnDefinition Width="0.25*"/>  
+        </Grid.ColumnDefinitions>
         
         <Rectangle Grid.Row="0" Fill="DimGray"></Rectangle>
-        <Image Grid.Row="1" Source="{Binding CurrentSheet}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"></Image>
-        <Button Grid.Row="0" Content="Load" Click="ButtonBase_OnClick"></Button>
+        <Image Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Source="{Binding CurrentSheet}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"></Image>
+        <Button Grid.Row="0" Grid.Column="0" Content="Load" Click="ButtonBase_OnClick"></Button>
+        <controls:PlaybackControls Grid.Column="1" Grid.Row="0"></controls:PlaybackControls>
     </Grid>
 </Window>

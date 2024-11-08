@@ -29,7 +29,7 @@
         <local:DropDown Grid.Row="3" Grid.Column="0" x:Name= "InputDeviceDropDown"></local:DropDown>
         <TextBlock Visibility="{Binding FromFileVisible}" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" Text="Simulation File"/>
         <local:SimulatedInputFileDropDown Visibility="{Binding FromFileVisible}" Grid.Row="5" Grid.Column="0" x:Name= "SimulatedInputFileDropDown" ></local:SimulatedInputFileDropDown>
-        <local:PlaybackControls Grid.Column="0" Grid.Row="6"></local:PlaybackControls>
+        
         
     </Grid>
     
