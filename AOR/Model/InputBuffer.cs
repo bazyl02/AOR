@@ -84,7 +84,6 @@ namespace AOR.Model
             _notesInProgress.Clear();
             _stopwatch.Reset();
             _stopwatch.Start();
-            Console.WriteLine(_stopwatch.IsRunning);
             _previousGlobalTime = 0;
         }
     }
