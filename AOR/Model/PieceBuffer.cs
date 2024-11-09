@@ -76,7 +76,6 @@ namespace AOR.Model
                                     long tempo = tempoMap.GetTempoAtTime(new MidiTimeSpan(globalMidiTrackTime)).MicrosecondsPerQuarterNote;
                                     double divider = (tempo / (division * 1.0d)) / InputBuffer.TickResolution * 1.0d;
                                     long localTime = (long)(onEvent.DeltaTime * divider);
-                                    
                                     globalTrackTime += localTime;
                                     AddToMelodyBuffer(onEvent.NoteNumber,(uint)globalTrackTime);
                                 }
@@ -102,7 +101,6 @@ namespace AOR.Model
                                     long tempo = tempoMap.GetTempoAtTime(new MidiTimeSpan(globalMidiTrackTime)).MicrosecondsPerQuarterNote;
                                     double divider = (tempo / (division * 1.0d)) / InputBuffer.TickResolution * 1.0d;
                                     long localTime = (long)(offEvent.DeltaTime * divider);
-                                    
                                     globalTrackTime += localTime;
                                     AddToMelodyBuffer(offEvent.NoteNumber,(uint)globalTrackTime);
                                 }

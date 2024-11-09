@@ -4,6 +4,7 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using AOR.ModelView;
 using Melanchall.DryWetMidi.Core;
+using Melanchall.DryWetMidi.Interaction;
 using Melanchall.DryWetMidi.Multimedia;
 
 namespace AOR.Model
@@ -51,20 +52,27 @@ namespace AOR.Model
             SimulatedInput.EventPlayed += OnEventPlayed;
         }
         
+        
+        private long globalTime = 0;
         private void OnEventPlayed(object sender, MidiEventPlayedEventArgs args)
         {
             Playback playback = (Playback)sender;
             MidiEventType type = args.Event.EventType;
+            
             switch (type)
             {
                 case MidiEventType.NoteOn:
                     NoteOnEvent noteOnEvent = (NoteOnEvent)args.Event;
-                    //Console.WriteLine("Event received from Midi File at " + DateTime.Now + " tone: " + noteOnEvent.NoteNumber);
+                    globalTime += noteOnEvent.DeltaTime;
                     Bindings.GetInstance().InputBuffer.BufferSimulatedInput(true,noteOnEvent.NoteNumber, noteOnEvent.DeltaTime);
                     break;
                 case MidiEventType.NoteOff:
                     NoteOffEvent noteOffEvent = (NoteOffEvent)args.Event;
-                    //Console.WriteLine("Event received from Midi File at " + DateTime.Now + " tone: " + noteOffEvent.NoteNumber);
+                    globalTime += noteOffEvent.DeltaTime;
+                    long tempo = playback.TempoMap.GetTempoAtTime(new MidiTimeSpan(globalTime)).MicrosecondsPerQuarterNote;
+                    double divider = (tempo / (128 * 1.0d)) / InputBuffer.TickResolution * 1.0d;
+                    long time = (long)(globalTime * divider);
+                    Console.WriteLine(@"Simulated input time: " + time);
                     Bindings.GetInstance().InputBuffer.BufferSimulatedInput(false,noteOffEvent.NoteNumber, noteOffEvent.DeltaTime);
                     break;
             }

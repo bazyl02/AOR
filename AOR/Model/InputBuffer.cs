@@ -28,7 +28,8 @@ namespace AOR.Model
                  _notesInProgress.Remove(tone);
                  EndTimestamp = timestamp;
                  //TODO: Remove later
-                 Console.WriteLine(Bindings.GetInstance().Algorithm.Run());
+                 Console.WriteLine(@"Predicted time: " + Bindings.GetInstance().Algorithm.Run());
+                 Console.WriteLine(@"----------------------------------------------");
              }
              else
              {
@@ -49,28 +50,29 @@ namespace AOR.Model
             ticks /= Stopwatch.Frequency / TickResolution;
             if (on)
             {
-                Console.WriteLine("Received Note On event. Tone: " + tone + " | DeltaTime: " + ticks);
+                Console.WriteLine(@"Received Note On event. Tone: " + tone + @" | DeltaTime: " + ticks);
                 
             }
             else
             {
-                Console.WriteLine("Received Note Off event. Tone: " + tone + " | DeltaTime: " + ticks);
+                Console.WriteLine(@"Received Note Off event. Tone: " + tone + @" | DeltaTime: " + ticks);
             }
             BufferInput(tone, (uint)ticks, on);
         }
-
+        
         public void BufferSimulatedInput(bool on, byte tone, long deltaTime)
         {
             long ticks = _stopwatch.ElapsedTicks;
             ticks /= Stopwatch.Frequency / TickResolution;
+            
             if (on)
             {
-                Console.WriteLine("Received Note On event. Tone: " + tone + " | Delta Time: " + ticks);
+                //Console.WriteLine(@"Received Note On event. Tone: " + tone + @" | Delta Time: " + ticks);
                 
             }
             else
             {
-                Console.WriteLine("Received Note Off event. Tone: " + tone + " | Delta Time: " + ticks);
+                //Console.WriteLine(@"Received Note Off event. Tone: " + tone + @" | Delta Time: " + ticks);
             }
             BufferInput(tone,(uint)ticks,on);
         }
