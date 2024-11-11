@@ -47,13 +47,14 @@ namespace AOR.Model
         
         public void SetTrackForSimulatedInput(MidiFile track)
         {
+            _globalTime = 0;
             SimulatedInput?.Dispose();
             SimulatedInput = OutputDevice != null ? track.GetPlayback(OutputDevice) : track.GetPlayback();
             SimulatedInput.EventPlayed += OnEventPlayed;
         }
         
         
-        private long globalTime = 0;
+        private long _globalTime = 0;
         private void OnEventPlayed(object sender, MidiEventPlayedEventArgs args)
         {
             Playback playback = (Playback)sender;
@@ -63,15 +64,15 @@ namespace AOR.Model
             {
                 case MidiEventType.NoteOn:
                     NoteOnEvent noteOnEvent = (NoteOnEvent)args.Event;
-                    globalTime += noteOnEvent.DeltaTime;
+                    _globalTime += noteOnEvent.DeltaTime;
                     Bindings.GetInstance().InputBuffer.BufferSimulatedInput(true,noteOnEvent.NoteNumber, noteOnEvent.DeltaTime);
                     break;
                 case MidiEventType.NoteOff:
                     NoteOffEvent noteOffEvent = (NoteOffEvent)args.Event;
-                    globalTime += noteOffEvent.DeltaTime;
-                    long tempo = playback.TempoMap.GetTempoAtTime(new MidiTimeSpan(globalTime)).MicrosecondsPerQuarterNote;
+                    _globalTime += noteOffEvent.DeltaTime;
+                    long tempo = playback.TempoMap.GetTempoAtTime(new MidiTimeSpan(_globalTime)).MicrosecondsPerQuarterNote;
                     double divider = (tempo / (128 * 1.0d)) / InputBuffer.TickResolution * 1.0d;
-                    long time = (long)(globalTime * divider);
+                    long time = (long)(_globalTime * divider);
                     Console.WriteLine(@"Simulated input time: " + time);
                     Bindings.GetInstance().InputBuffer.BufferSimulatedInput(false,noteOffEvent.NoteNumber, noteOffEvent.DeltaTime);
                     break;

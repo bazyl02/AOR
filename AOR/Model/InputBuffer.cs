@@ -9,6 +9,7 @@ namespace AOR.Model
     {
         public const int UserBufferSize = 20;
         public const long TickResolution = 1000;
+        public const int MinimumBufferSize = 5;
         
         public List<NoteLine> UserBuffer = new List<NoteLine>(UserBufferSize);
         private Dictionary<byte, NoteLine> _notesInProgress = new Dictionary<byte, NoteLine>();
@@ -28,7 +29,10 @@ namespace AOR.Model
                  _notesInProgress.Remove(tone);
                  EndTimestamp = timestamp;
                  //TODO: Remove later
-                 Console.WriteLine(@"Predicted time: " + Bindings.GetInstance().Algorithm.Run());
+                 if(MinimumBufferSize <= UserBuffer.Count)
+                 {
+                     Console.WriteLine(@"Predicted time: " + Bindings.GetInstance().Algorithm.Run());
+                 }
                  Console.WriteLine(@"----------------------------------------------");
              }
              else
@@ -81,7 +85,6 @@ namespace AOR.Model
         //Clears any previously buffered data
         public void Clear()
         {
-            
             StartTimestamp = 0;
             EndTimestamp = 0;
             UserBuffer.Clear();
