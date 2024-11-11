@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
 using AOR.ModelView;
 using Melanchall.DryWetMidi.Core;
 using Melanchall.DryWetMidi.Interaction;

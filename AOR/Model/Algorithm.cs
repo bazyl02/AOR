@@ -63,12 +63,7 @@ namespace AOR.Model
                     amount++;
                 }
                 float totalSegmentRatio = sum / amount;
-                //if (highestRatio < totalSegmentRatio)
-                //{
-                //    highestRatio = totalSegmentRatio;
-                //    highestRatioIndex = i;
-                //}
-
+                
                 for (int j = 0; j < 3; j++)
                 {
                     if (_highestRatios[j] < totalSegmentRatio)
