@@ -1,5 +1,9 @@
-﻿using System.Collections.Generic;
-using AOR.ModelView;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
+using System.Threading.Tasks;
+using Windows.Data.Pdf;
 using Melanchall.DryWetMidi.Core;
 
 namespace AOR.Model
@@ -13,25 +17,46 @@ namespace AOR.Model
         
         public List<PieceData> Pieces;
 
-        public void LoadSong(string path)
+        public async Task LoadSong(string path)
         {
-            MidiFile song = MidiFile.Read(path);
-            PieceData newPiece = new PieceData(song, path);
-            if (!Pieces.Contains(newPiece))
+            using (FileStream zipFile = new FileStream(path,FileMode.Open))
             {
-                Pieces.Add(newPiece);
+                ZipArchive archive = new ZipArchive(zipFile, ZipArchiveMode.Read);
+                MidiFile file = null;
+                PdfDocument document = null;
+                foreach (ZipArchiveEntry entry in archive.Entries)
+                {
+                    if (entry.Name.Contains(".pdf"))
+                    {
+                        MemoryStream stream = new MemoryStream();
+                        await entry.Open().CopyToAsync(stream);
+                        document = await PdfDocument.LoadFromStreamAsync(stream.AsRandomAccessStream());
+                    } 
+                    else if (entry.Name.Contains(".mid"))
+                    {
+                        file = MidiFile.Read(entry.Open());
+                    }
+                }
+                if (file is null || document is null) return;
+                PieceData newPiece = new PieceData(file,document, path);
+                if (!Pieces.Contains(newPiece))
+                {
+                    Pieces.Add(newPiece);
+                }
             }
         }
         
         public class PieceData
         {
             public MidiFile MidiFile;
+            public PdfDocument PdfDocument;
             public string Path;
             public string SongName;
 
-            public PieceData(MidiFile file, string path)
+            public PieceData(MidiFile file,PdfDocument document , string path)
             {
                 MidiFile = file;
+                PdfDocument = document;
                 Path = path;
                 SongName = System.IO.Path.GetFileNameWithoutExtension(Path);
             }
