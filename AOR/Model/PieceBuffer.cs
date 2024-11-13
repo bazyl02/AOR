@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Windows.Media.Imaging;
 using Melanchall.DryWetMidi.Core;
 using Melanchall.DryWetMidi.Interaction;
+using System.IO.Compression;
 
 namespace AOR.Model
 {
@@ -12,6 +14,8 @@ namespace AOR.Model
         
         public List<MidiEventData> RegistrantsChangesBuffer = new List<MidiEventData>();
         public List<MidiEventData> PageChangesBuffer = new List<MidiEventData>();
+
+        public List<BitmapImage> SheetPages;
         
         private void AddToMelodyBuffer(byte tone, uint timestamp)
         {
