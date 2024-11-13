@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
 using AOR.ModelView;
 using Melanchall.DryWetMidi.Core;
+using Melanchall.DryWetMidi.Interaction;
 using Melanchall.DryWetMidi.Multimedia;
 
 namespace AOR.Model
@@ -46,25 +45,33 @@ namespace AOR.Model
         
         public void SetTrackForSimulatedInput(MidiFile track)
         {
+            _globalTime = 0;
             SimulatedInput?.Dispose();
-            SimulatedInput = track.GetPlayback();
+            SimulatedInput = OutputDevice != null ? track.GetPlayback(OutputDevice) : track.GetPlayback();
             SimulatedInput.EventPlayed += OnEventPlayed;
         }
         
+        
+        private long _globalTime = 0;
         private void OnEventPlayed(object sender, MidiEventPlayedEventArgs args)
         {
             Playback playback = (Playback)sender;
             MidiEventType type = args.Event.EventType;
+            
             switch (type)
             {
                 case MidiEventType.NoteOn:
                     NoteOnEvent noteOnEvent = (NoteOnEvent)args.Event;
-                    //Console.WriteLine("Event received from Midi File at " + DateTime.Now + " tone: " + noteOnEvent.NoteNumber);
+                    _globalTime += noteOnEvent.DeltaTime;
                     Bindings.GetInstance().InputBuffer.BufferSimulatedInput(true,noteOnEvent.NoteNumber, noteOnEvent.DeltaTime);
                     break;
                 case MidiEventType.NoteOff:
                     NoteOffEvent noteOffEvent = (NoteOffEvent)args.Event;
-                    //Console.WriteLine("Event received from Midi File at " + DateTime.Now + " tone: " + noteOffEvent.NoteNumber);
+                    _globalTime += noteOffEvent.DeltaTime;
+                    long tempo = playback.TempoMap.GetTempoAtTime(new MidiTimeSpan(_globalTime)).MicrosecondsPerQuarterNote;
+                    double divider = (tempo / (128 * 1.0d)) / InputBuffer.TickResolution * 1.0d;
+                    long time = (long)(_globalTime * divider);
+                    Console.WriteLine(@"Simulated input time: " + time);
                     Bindings.GetInstance().InputBuffer.BufferSimulatedInput(false,noteOffEvent.NoteNumber, noteOffEvent.DeltaTime);
                     break;
             }

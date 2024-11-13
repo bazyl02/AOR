@@ -29,6 +29,7 @@ namespace AOR.ModelView
         public SongManager SongManager;
         public InputBuffer InputBuffer;
         public PieceBuffer PieceBuffer;
+        public Algorithm Algorithm;
 
         public SongList SongList;
 

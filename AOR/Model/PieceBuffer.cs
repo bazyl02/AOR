@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using Melanchall.DryWetMidi.Core;
 using Melanchall.DryWetMidi.Interaction;
 
@@ -9,10 +7,28 @@ namespace AOR.Model
 {
     public class PieceBuffer
     {
-        public List<MidiEventData> MelodyBuffer = new List<MidiEventData>();
+        public List<NoteLine> MelodyBuffer = new List<NoteLine>();
+        private Dictionary<byte, NoteLine> _notesInProgress = new Dictionary<byte, NoteLine>();
+        
         public List<MidiEventData> RegistrantsChangesBuffer = new List<MidiEventData>();
         public List<MidiEventData> PageChangesBuffer = new List<MidiEventData>();
-
+        
+        private void AddToMelodyBuffer(byte tone, uint timestamp)
+        {
+            bool result = _notesInProgress.TryGetValue(tone, out NoteLine line);
+            if (result)
+            {
+                line.EndTime = timestamp;
+                _notesInProgress.Remove(tone);
+            }
+            else
+            {
+                NoteLine newNoteLine = new NoteLine(tone, timestamp, 0);
+                MelodyBuffer.Add(newNoteLine);
+                _notesInProgress.Add(tone, newNoteLine);
+            }
+        }
+        
         public PieceBuffer(MidiFile file)
         {
             //Get chunks
@@ -60,9 +76,8 @@ namespace AOR.Model
                                     long tempo = tempoMap.GetTempoAtTime(new MidiTimeSpan(globalMidiTrackTime)).MicrosecondsPerQuarterNote;
                                     double divider = (tempo / (division * 1.0d)) / InputBuffer.TickResolution * 1.0d;
                                     long localTime = (long)(onEvent.DeltaTime * divider);
-                                    
                                     globalTrackTime += localTime;
-                                    MelodyBuffer.Add(new MidiEventData(true,onEvent.NoteNumber,localTime,globalTrackTime));
+                                    AddToMelodyBuffer(onEvent.NoteNumber,(uint)globalTrackTime);
                                 }
                                 //Register channel
                                 else if (onEvent.Channel == fileChannels[1])
@@ -86,9 +101,8 @@ namespace AOR.Model
                                     long tempo = tempoMap.GetTempoAtTime(new MidiTimeSpan(globalMidiTrackTime)).MicrosecondsPerQuarterNote;
                                     double divider = (tempo / (division * 1.0d)) / InputBuffer.TickResolution * 1.0d;
                                     long localTime = (long)(offEvent.DeltaTime * divider);
-                                    
                                     globalTrackTime += localTime;
-                                    MelodyBuffer.Add(new MidiEventData(false,offEvent.NoteNumber,localTime,globalTrackTime));
+                                    AddToMelodyBuffer(offEvent.NoteNumber,(uint)globalTrackTime);
                                 }
                                 //Register channel
                                 else if (offEvent.Channel == fileChannels[1])
@@ -104,7 +118,7 @@ namespace AOR.Model
                                     long localTime = (long)(offEvent.DeltaTime * divider);
                                     
                                     globalPageTime += localTime;
-                                    MelodyBuffer.Add(new MidiEventData(false,offEvent.NoteNumber,localTime,globalTrackTime));
+                                    //MelodyBuffer.Add(new MidiEventData(false,offEvent.NoteNumber,localTime,globalTrackTime));
                                 }
                                 break;
                             }
@@ -122,6 +136,7 @@ namespace AOR.Model
                     Console.WriteLine(@"Header chunk detected!");
                 }
             }
+            _notesInProgress.Clear();
         }
     }
 }
