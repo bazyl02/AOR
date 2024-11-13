@@ -21,7 +21,6 @@
         
         <Rectangle Grid.Row="0" Fill="DimGray"></Rectangle>
         <Image Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Source="{Binding CurrentSheet}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"></Image>
-        <Button Grid.Row="0" Grid.Column="0" Content="Load" Click="ButtonBase_OnClick"></Button>
         <controls:PlaybackControls Grid.Column="1" Grid.Row="0"></controls:PlaybackControls>
     </Grid>
 </Window>

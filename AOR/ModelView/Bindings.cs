@@ -119,10 +119,11 @@ namespace AOR.ModelView
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public void ProcessSelectedPiece()
+        public async void ProcessSelectedPiece()
         {
             if(SelectedPiece is null) return;
             PieceBuffer = new PieceBuffer(SelectedPiece.MidiFile);
+            await PieceBuffer.LoadPdfPages(SelectedPiece.PdfDocument);
         }
     }
 }

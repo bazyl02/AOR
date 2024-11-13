@@ -1,9 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Windows.Media.Imaging;
 using Melanchall.DryWetMidi.Core;
 using Melanchall.DryWetMidi.Interaction;
 using System.IO.Compression;
+using System.Threading.Tasks;
+using Windows.Data.Pdf;
+using Windows.Storage;
+using Windows.Storage.Streams;
+using AOR.ModelView;
 
 namespace AOR.Model
 {
@@ -15,7 +21,7 @@ namespace AOR.Model
         public List<MidiEventData> RegistrantsChangesBuffer = new List<MidiEventData>();
         public List<MidiEventData> PageChangesBuffer = new List<MidiEventData>();
 
-        public List<BitmapImage> SheetPages;
+        public List<BitmapImage> SheetPages = null;
         
         private void AddToMelodyBuffer(byte tone, uint timestamp)
         {
@@ -141,6 +147,29 @@ namespace AOR.Model
                 }
             }
             _notesInProgress.Clear();
+        }
+        
+        public async Task LoadPdfPages(PdfDocument pdfDocument)
+        {
+            List<BitmapImage> output = new List<BitmapImage>();
+            for (uint i = 0; i < pdfDocument.PageCount; i++)
+            {
+                using (PdfPage page = pdfDocument.GetPage(i))
+                {
+                    using (InMemoryRandomAccessStream memStream = new InMemoryRandomAccessStream())
+                    {
+                        await page.RenderToStreamAsync(memStream);
+                        var bi = new BitmapImage(); 
+                        bi.BeginInit();
+                        bi.CacheOption = BitmapCacheOption.OnLoad;
+                        bi.StreamSource = memStream.AsStream();
+                        bi.EndInit();
+                        output.Add(bi);
+                    }
+                }
+            }
+            SheetPages = output;
+            if(SheetPages.Count > 0) Bindings.GetInstance().CurrentSheet = SheetPages[0];
         }
     }
 }

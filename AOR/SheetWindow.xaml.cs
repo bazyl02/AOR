@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Media.Imaging;
-using Windows.Data.Pdf;
-using Windows.Storage;
-using Windows.Storage.Streams;
+using Windows.Graphics.Display;
 using AOR.ModelView;
+using Melanchall.DryWetMidi.Multimedia;
 
 namespace AOR
 {
@@ -19,35 +14,14 @@ namespace AOR
             DataContext = Bindings.GetInstance();
         }
 
-        public async Task<List<BitmapImage>> GetPdfPages(string path)
+        protected override void OnClosed(EventArgs e)
         {
-            List<BitmapImage> output = new List<BitmapImage>();
-            StorageFile storagePdfFile = await StorageFile.GetFileFromPathAsync(path);
-            PdfDocument pdfDocument = await PdfDocument.LoadFromFileAsync(storagePdfFile);
-            for (uint i = 0; i < pdfDocument.PageCount; i++)
+            if (Bindings.GetInstance().DeviceController.SimulatedInput != null)
             {
-                using (PdfPage page = pdfDocument.GetPage(i))
-                {
-                    using (InMemoryRandomAccessStream memStream = new InMemoryRandomAccessStream())
-                    {
-                        await page.RenderToStreamAsync(memStream);
-                        var bi = new BitmapImage(); 
-                        bi.BeginInit();
-                        bi.CacheOption = BitmapCacheOption.OnLoad;
-                        bi.StreamSource = memStream.AsStream();
-                        bi.EndInit();
-                        output.Add(bi);
-                    }
-                }
+                Playback playback = Bindings.GetInstance().DeviceController.SimulatedInput;
+                playback.Stop();
+                playback.MoveToStart();
             }
-            return output;
-        }
-
-        private async void ButtonBase_OnClick(object sender, RoutedEventArgs e)
-        {
-            string path = Path.GetFullPath("..\\..\\Data\\Sprawozdanie2.pdf");
-            List<BitmapImage> pages = await GetPdfPages(path);
-            Bindings.GetInstance().CurrentSheet = pages[1];
         }
     }
 }
