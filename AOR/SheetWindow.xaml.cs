@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Windows;
-using Windows.Graphics.Display;
 using AOR.ModelView;
 using Melanchall.DryWetMidi.Multimedia;
 

@@ -4,10 +4,8 @@ using System.IO;
 using System.Windows.Media.Imaging;
 using Melanchall.DryWetMidi.Core;
 using Melanchall.DryWetMidi.Interaction;
-using System.IO.Compression;
 using System.Threading.Tasks;
 using Windows.Data.Pdf;
-using Windows.Storage;
 using Windows.Storage.Streams;
 using AOR.ModelView;
 
@@ -20,8 +18,25 @@ namespace AOR.Model
         
         public List<MidiEventData> RegistrantsChangesBuffer = new List<MidiEventData>();
         public List<MidiEventData> PageChangesBuffer = new List<MidiEventData>();
+        
+        private List<BitmapImage> _sheetPages = null;
 
-        public List<BitmapImage> SheetPages = null;
+        private uint _currentTimeValue = 0;
+
+        public uint CurrentTimeValue
+        {
+            get => _currentTimeValue;
+            set
+            {
+                _currentTimeValue = value;
+                TimeValueChanged();
+            }
+        }
+
+        private void TimeValueChanged()
+        {
+            
+        }
         
         private void AddToMelodyBuffer(byte tone, uint timestamp)
         {
@@ -168,8 +183,8 @@ namespace AOR.Model
                     }
                 }
             }
-            SheetPages = output;
-            if(SheetPages.Count > 0) Bindings.GetInstance().CurrentSheet = SheetPages[0];
+            _sheetPages = output;
+            if(_sheetPages.Count > 0) Bindings.GetInstance().CurrentSheet = _sheetPages[0];
         }
     }
 }
