@@ -53,6 +53,7 @@ namespace AOR.Model
         
         
         private long _globalTime = 0;
+        private long _globalRealTime = 0;
         private void OnEventPlayed(object sender, MidiEventPlayedEventArgs args)
         {
             Playback playback = (Playback)sender;
@@ -63,6 +64,10 @@ namespace AOR.Model
                 case MidiEventType.NoteOn:
                     NoteOnEvent noteOnEvent = (NoteOnEvent)args.Event;
                     _globalTime += noteOnEvent.DeltaTime;
+                    long tempoOn = playback.TempoMap.GetTempoAtTime(new MidiTimeSpan(_globalTime)).MicrosecondsPerQuarterNote;
+                    double dividerOn = (tempoOn / (128 * 1.0d)) / InputBuffer.TickResolution * 1.0d;
+                    long timeOn = (long)Math.Round(noteOnEvent.DeltaTime * dividerOn);
+                    _globalRealTime += timeOn;
                     Bindings.GetInstance().InputBuffer.BufferSimulatedInput(true,noteOnEvent.NoteNumber, noteOnEvent.DeltaTime);
                     break;
                 case MidiEventType.NoteOff:
@@ -70,8 +75,9 @@ namespace AOR.Model
                     _globalTime += noteOffEvent.DeltaTime;
                     long tempo = playback.TempoMap.GetTempoAtTime(new MidiTimeSpan(_globalTime)).MicrosecondsPerQuarterNote;
                     double divider = (tempo / (128 * 1.0d)) / InputBuffer.TickResolution * 1.0d;
-                    long time = (long)Math.Round(_globalTime * divider);
-                    Console.WriteLine(@"Simulated input time: " + time);
+                    long time = (long)Math.Round(noteOffEvent.DeltaTime * divider);
+                    _globalRealTime += time;
+                    Console.WriteLine(@"Simulated input time: " + _globalRealTime);
                     Bindings.GetInstance().InputBuffer.BufferSimulatedInput(false,noteOffEvent.NoteNumber, noteOffEvent.DeltaTime);
                     break;
             }
