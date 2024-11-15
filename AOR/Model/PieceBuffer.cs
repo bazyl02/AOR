@@ -100,8 +100,7 @@ namespace AOR.Model
                                     globalMidiTrackTime += onEvent.DeltaTime;
                                     long tempo = tempoMap.GetTempoAtTime(new MidiTimeSpan(globalMidiTrackTime)).MicrosecondsPerQuarterNote;
                                     double divider = (tempo / (division * 1.0d)) / InputBuffer.TickResolution * 1.0d;
-                                    long localTime = (long)(onEvent.DeltaTime * divider);
-                                    globalTrackTime += localTime;
+                                    globalTrackTime = (long)Math.Round(globalMidiTrackTime * divider);
                                     AddToMelodyBuffer(onEvent.NoteNumber,(uint)globalTrackTime);
                                 }
                                 //Register channel
@@ -125,8 +124,7 @@ namespace AOR.Model
                                     globalMidiTrackTime += offEvent.DeltaTime;
                                     long tempo = tempoMap.GetTempoAtTime(new MidiTimeSpan(globalMidiTrackTime)).MicrosecondsPerQuarterNote;
                                     double divider = (tempo / (division * 1.0d)) / InputBuffer.TickResolution * 1.0d;
-                                    long localTime = (long)(offEvent.DeltaTime * divider);
-                                    globalTrackTime += localTime;
+                                    globalTrackTime = (long)Math.Round(globalMidiTrackTime * divider);
                                     AddToMelodyBuffer(offEvent.NoteNumber,(uint)globalTrackTime);
                                 }
                                 //Register channel
@@ -140,9 +138,7 @@ namespace AOR.Model
                                     globalMidiPageTime += offEvent.DeltaTime;
                                     long tempo = tempoMap.GetTempoAtTime(new MidiTimeSpan(globalMidiPageTime)).MicrosecondsPerQuarterNote;
                                     double divider = (tempo / (division * 1.0d)) / InputBuffer.TickResolution * 1.0d;
-                                    long localTime = (long)(offEvent.DeltaTime * divider);
-                                    
-                                    globalPageTime += localTime;
+                                    globalPageTime = (long)Math.Round(globalMidiPageTime * divider);
                                     //MelodyBuffer.Add(new MidiEventData(false,offEvent.NoteNumber,localTime,globalTrackTime));
                                 }
                                 break;

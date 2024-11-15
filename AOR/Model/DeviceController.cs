@@ -70,7 +70,7 @@ namespace AOR.Model
                     _globalTime += noteOffEvent.DeltaTime;
                     long tempo = playback.TempoMap.GetTempoAtTime(new MidiTimeSpan(_globalTime)).MicrosecondsPerQuarterNote;
                     double divider = (tempo / (128 * 1.0d)) / InputBuffer.TickResolution * 1.0d;
-                    long time = (long)(_globalTime * divider);
+                    long time = (long)Math.Round(_globalTime * divider);
                     Console.WriteLine(@"Simulated input time: " + time);
                     Bindings.GetInstance().InputBuffer.BufferSimulatedInput(false,noteOffEvent.NoteNumber, noteOffEvent.DeltaTime);
                     break;
