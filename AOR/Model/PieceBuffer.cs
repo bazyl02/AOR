@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Windows.Media.Imaging;
 using Melanchall.DryWetMidi.Core;
 using Melanchall.DryWetMidi.Interaction;
@@ -22,6 +23,7 @@ namespace AOR.Model
         private List<BitmapImage> _sheetPages = null;
 
         private int _currentRegistrantIndex = 0;
+        private int _currentPageIndex = 0;
         
         private uint _currentTimeValue = 0;
 
@@ -45,6 +47,15 @@ namespace AOR.Model
                 _currentRegistrantIndex++;
             }
             //Check for page change events
+            if (_pageChangesBuffer.Count > _currentPageIndex && _pageChangesBuffer[_currentPageIndex].StartTimeStamp <= _currentTimeValue)
+            {
+                int pageNum = _pageChangesBuffer[_currentPageIndex].PageNumber;
+                if (_sheetPages.Count > pageNum)
+                {
+                    Bindings.GetInstance().CurrentSheet = _sheetPages[pageNum];
+                    _currentPageIndex++;
+                }
+            }
             
         }
         
@@ -126,10 +137,12 @@ namespace AOR.Model
                                 if (midiEvent.EventType == MidiEventType.NoteOn)
                                 {
                                     NoteOnEvent onEvent = (NoteOnEvent)midiEvent;
+                                    _pageChangesBuffer.Add(new PageData(onEvent.NoteNumber,globalTrackTime,0));
                                 } 
                                 else if (midiEvent.EventType == MidiEventType.NoteOff)
                                 {
                                     NoteOffEvent offEvent = (NoteOffEvent)midiEvent;
+                                    _pageChangesBuffer.Last().EndTimeStamp = globalTrackTime;
                                 }
                                 break;
                             }
@@ -138,6 +151,15 @@ namespace AOR.Model
                     index++;
                 }
                 if(index >= 3) break;
+            }
+
+            if (_pageChangesBuffer.Count > 0)
+            {
+                int rootPageNum = _pageChangesBuffer[0].PageNumber;
+                foreach (var page in _pageChangesBuffer)
+                {
+                    page.PageNumber -= rootPageNum;
+                }
             }
             _notesInProgress.Clear();
         }
