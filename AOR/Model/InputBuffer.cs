@@ -28,10 +28,11 @@ namespace AOR.Model
                  line.EndTime = timestamp;
                  _notesInProgress.Remove(tone);
                  EndTimestamp = timestamp;
-                 //TODO: Remove later
                  if(MinimumBufferSize <= UserBuffer.Count)
                  {
-                     Console.WriteLine(@"Predicted time: " + Bindings.GetInstance().Algorithm.Run());
+                     uint runResult = Bindings.GetInstance().Algorithm.Run();
+                     Bindings.GetInstance().PieceBuffer.CurrentTimeValue = runResult;
+                     Console.WriteLine(@"Predicted time: " + runResult);
                  }
                  Console.WriteLine(@"----------------------------------------------");
              }

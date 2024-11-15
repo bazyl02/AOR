@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Windows.Media.Imaging;
 using Melanchall.DryWetMidi.Core;
 using Melanchall.DryWetMidi.Interaction;
-using System.IO.Compression;
+using System.Threading.Tasks;
+using Windows.Data.Pdf;
+using Windows.Storage.Streams;
+using AOR.ModelView;
 
 namespace AOR.Model
 {
@@ -14,8 +18,25 @@ namespace AOR.Model
         
         public List<MidiEventData> RegistrantsChangesBuffer = new List<MidiEventData>();
         public List<MidiEventData> PageChangesBuffer = new List<MidiEventData>();
+        
+        private List<BitmapImage> _sheetPages = null;
 
-        public List<BitmapImage> SheetPages;
+        private uint _currentTimeValue = 0;
+
+        public uint CurrentTimeValue
+        {
+            get => _currentTimeValue;
+            set
+            {
+                _currentTimeValue = value;
+                TimeValueChanged();
+            }
+        }
+
+        private void TimeValueChanged()
+        {
+            
+        }
         
         private void AddToMelodyBuffer(byte tone, uint timestamp)
         {
@@ -141,6 +162,29 @@ namespace AOR.Model
                 }
             }
             _notesInProgress.Clear();
+        }
+        
+        public async Task LoadPdfPages(PdfDocument pdfDocument)
+        {
+            List<BitmapImage> output = new List<BitmapImage>();
+            for (uint i = 0; i < pdfDocument.PageCount; i++)
+            {
+                using (PdfPage page = pdfDocument.GetPage(i))
+                {
+                    using (InMemoryRandomAccessStream memStream = new InMemoryRandomAccessStream())
+                    {
+                        await page.RenderToStreamAsync(memStream);
+                        var bi = new BitmapImage(); 
+                        bi.BeginInit();
+                        bi.CacheOption = BitmapCacheOption.OnLoad;
+                        bi.StreamSource = memStream.AsStream();
+                        bi.EndInit();
+                        output.Add(bi);
+                    }
+                }
+            }
+            _sheetPages = output;
+            if(_sheetPages.Count > 0) Bindings.GetInstance().CurrentSheet = _sheetPages[0];
         }
     }
 }
