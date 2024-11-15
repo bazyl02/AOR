@@ -13,14 +13,16 @@ namespace AOR.Model
 {
     public class PieceBuffer
     {
-        public List<NoteLine> MelodyBuffer = new List<NoteLine>();
-        private Dictionary<byte, NoteLine> _notesInProgress = new Dictionary<byte, NoteLine>();
+        public readonly List<NoteLine> MelodyBuffer = new List<NoteLine>();
+        private readonly Dictionary<byte, NoteLine> _notesInProgress = new Dictionary<byte, NoteLine>();
         
-        public List<MidiEventData> RegistrantsChangesBuffer = new List<MidiEventData>();
-        public List<PageData> PageChangesBuffer = new List<PageData>();
+        private readonly List<MidiEventData> _registrantsChangesBuffer = new List<MidiEventData>();
+        private List<PageData> _pageChangesBuffer = new List<PageData>();
         
         private List<BitmapImage> _sheetPages = null;
 
+        private int _currentRegistrantIndex = 0;
+        
         private uint _currentTimeValue = 0;
 
         public uint CurrentTimeValue
@@ -35,6 +37,14 @@ namespace AOR.Model
 
         private void TimeValueChanged()
         {
+            //Check for registrant change events
+            if (_registrantsChangesBuffer.Count > _currentRegistrantIndex &&
+                _registrantsChangesBuffer[_currentRegistrantIndex].GlobalTime <= _currentTimeValue)
+            {
+                Bindings.GetInstance().DeviceController.OutputDevice.SendEvent(_registrantsChangesBuffer[_currentRegistrantIndex].Event);
+                _currentRegistrantIndex++;
+            }
+            //Check for page change events
             
         }
         
@@ -56,12 +66,10 @@ namespace AOR.Model
         
         public PieceBuffer(MidiFile file)
         {
-            
+            if (file.OriginalFormat != MidiFileFormat.MultiTrack)
+                throw new InvalidDataException("Selected MIDI file has to be of type 1 (multi-track)");
             //Get chunks
             var chunks = file.Chunks;
-            //Get all used channels in the list and sort it ascending
-            var fileChannels = Helpers.GetChannels(file.GetChannels());
-            fileChannels.Sort();
             //Get file time division setting
             short division = 0;
             if (file.TimeDivision is TicksPerQuarterNoteTimeDivision)
@@ -69,56 +77,67 @@ namespace AOR.Model
                 TicksPerQuarterNoteTimeDivision timeDivision = (TicksPerQuarterNoteTimeDivision)file.TimeDivision;
                 division = timeDivision.TicksPerQuarterNote;
             }
-
             TempoMap tempoMap = file.ManageTempoMap().TempoMap;
-            
+            int index = 0;
             //Iterate through all chunks
-            foreach (var chunk in chunks)
+            foreach (MidiChunk chunk in chunks)
             {
-                //If it's a track chunk
                 if (chunk.ChunkId == "MTrk")
                 {
+                    Console.WriteLine(@"Chunk no. " + index);
                     TrackChunk trackChunk = (TrackChunk)chunk;
                     long globalMidiTrackTime = 0;
                     uint globalTrackTime = 0;
                     var events = trackChunk.Events;
-                    foreach (var evnt in events)
+                    foreach (MidiEvent midiEvent in events)
                     {
-                        if (evnt.EventType == MidiEventType.NoteOn || evnt.EventType == MidiEventType.NoteOff)
+                        globalMidiTrackTime += midiEvent.DeltaTime;
+                        long tempo = tempoMap.GetTempoAtTime(new MidiTimeSpan(globalMidiTrackTime)).MicrosecondsPerQuarterNote;
+                        double divider = (tempo / (division * 1.0d)) / InputBuffer.TickResolution * 1.0d;
+                        uint localTrackTime = (uint)Math.Round(midiEvent.DeltaTime * divider);
+                        globalTrackTime += localTrackTime;
+                        switch (index)
                         {
-                            globalMidiTrackTime += evnt.DeltaTime;
-                            long tempo = tempoMap.GetTempoAtTime(new MidiTimeSpan(globalMidiTrackTime)).MicrosecondsPerQuarterNote;
-                            double divider = (tempo / (division * 1.0d)) / InputBuffer.TickResolution * 1.0d;
-                            uint localTrackTime = (uint)Math.Round(evnt.DeltaTime * divider);
-                            globalTrackTime += localTrackTime;
-                            NoteEvent noteEvent = (NoteEvent)evnt;
-                            //Melody channel
-                            if (noteEvent.Channel == fileChannels[0])
+                            //Melody
+                            case 0:
                             {
-                                AddToMelodyBuffer(noteEvent.NoteNumber,globalTrackTime);
+                                if (midiEvent.EventType == MidiEventType.NoteOn || midiEvent.EventType == MidiEventType.NoteOff)
+                                {
+                                    NoteEvent noteEvent = (NoteEvent)midiEvent;
+                                    AddToMelodyBuffer(noteEvent.NoteNumber,globalTrackTime);
+                                }
+                                break;
                             }
-                            //Register channel
-                            else if (noteEvent.Channel == fileChannels[1])
+                            //Register changes
+                            case 1:
                             {
-                                RegistrantsChangesBuffer.Add(new MidiEventData(evnt,globalTrackTime));
+                                if (midiEvent.EventType == MidiEventType.NoteOn ||
+                                    midiEvent.EventType == MidiEventType.NoteOff ||
+                                    midiEvent.EventType == MidiEventType.ProgramChange ||
+                                    midiEvent.EventType == MidiEventType.NormalSysEx)
+                                {
+                                    _registrantsChangesBuffer.Add(new MidiEventData(midiEvent,globalTrackTime));
+                                }
+                                break;
                             }
-                            //Page channel
-                            else if (noteEvent.Channel == fileChannels[2])
+                            //Page changes
+                            case 2:
                             {
-                                    
+                                if (midiEvent.EventType == MidiEventType.NoteOn)
+                                {
+                                    NoteOnEvent onEvent = (NoteOnEvent)midiEvent;
+                                } 
+                                else if (midiEvent.EventType == MidiEventType.NoteOff)
+                                {
+                                    NoteOffEvent offEvent = (NoteOffEvent)midiEvent;
+                                }
+                                break;
                             }
-                        } 
-                        else if (evnt.EventType == MidiEventType.ProgramChange || evnt.EventType == MidiEventType.NormalSysEx)
-                        {
-                            globalMidiTrackTime += evnt.DeltaTime;
-                            long tempo = tempoMap.GetTempoAtTime(new MidiTimeSpan(globalMidiTrackTime)).MicrosecondsPerQuarterNote;
-                            double divider = (tempo / (division * 1.0d)) / InputBuffer.TickResolution * 1.0d;
-                            uint localTrackTime = (uint)Math.Round(evnt.DeltaTime * divider);
-                            globalTrackTime += localTrackTime;
-                            RegistrantsChangesBuffer.Add(new MidiEventData(evnt,globalTrackTime));
                         }
                     }
+                    index++;
                 }
+                if(index >= 3) break;
             }
             _notesInProgress.Clear();
         }
