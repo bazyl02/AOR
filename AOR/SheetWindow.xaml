@@ -19,8 +19,13 @@
             <ColumnDefinition Width="0.25*"/>  
         </Grid.ColumnDefinitions>
         
-        <Rectangle Grid.Row="0" Fill="DimGray"></Rectangle>
-        <Image Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Source="{Binding CurrentSheet}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"></Image>
+        <Canvas Name="Canvas1" Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Grid.ColumnSpan="2" Background="Gray">
+            <Image Name="Image1" Source="{Binding CurrentSheet}" Width="{Binding Path=ActualWidth, ElementName=Canvas1}" Height="{Binding Path=ActualHeight, ElementName=Canvas1}" Stretch="Uniform" ></Image>
+            <Image Name="Image2" Source="{Binding NewSheet}" Width="{Binding Path=ActualWidth, ElementName=Canvas1}" Height="{Binding Path=ActualHeight, ElementName=Canvas1}" Stretch="Uniform"/>
+        </Canvas>
+        
+        <Button Grid.Column="0" Grid.Row="0" Click="ButtonBase_OnClick"></Button>
+        
         <controls:PlaybackControls Grid.Column="1" Grid.Row="0"></controls:PlaybackControls>
     </Grid>
 </Window>

@@ -100,14 +100,35 @@ namespace AOR.ModelView
             }
         }
 
-        private BitmapSource _currentSheet;
+        private float _targetX;
 
+        public float TargetX
+        {
+            get => _targetX;
+            set
+            {
+                _targetX = value;
+            }
+        }
+        
+        private BitmapSource _currentSheet;
         public BitmapSource CurrentSheet
         {
             get => _currentSheet;
             set
             {
                 _currentSheet = value;
+                OnPropertyChanged();
+            }
+        }
+        
+        private BitmapSource _newSheet;
+        public BitmapSource NewSheet
+        {
+            get => _newSheet;
+            set
+            {
+                _newSheet = value;
                 OnPropertyChanged();
             }
         }
