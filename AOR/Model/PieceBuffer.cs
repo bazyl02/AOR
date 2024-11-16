@@ -21,18 +21,25 @@ namespace AOR.Model
         private List<PageData> _pageChangesBuffer = new List<PageData>();
         
         private List<BitmapImage> _sheetPages = null;
-
-        private int _currentRegistrantIndex = 0;
-        private int _currentPageIndex = 0;
         
+        
+        private uint _previousTimeValue = 0;
         private uint _currentTimeValue = 0;
-
         public uint CurrentTimeValue
         {
             get => _currentTimeValue;
             set
             {
-                _currentTimeValue = value;
+                if (_previousTimeValue == 0 && _currentTimeValue == 0)
+                {
+                    _previousTimeValue = value;
+                    _currentTimeValue = value;
+                }
+                else
+                {
+                    _previousTimeValue = _currentTimeValue;
+                    _currentTimeValue = value;
+                }
                 TimeValueChanged();
             }
         }
@@ -40,23 +47,21 @@ namespace AOR.Model
         private void TimeValueChanged()
         {
             //Check for registrant change events
-            if (_registrantsChangesBuffer.Count > _currentRegistrantIndex &&
-                _registrantsChangesBuffer[_currentRegistrantIndex].GlobalTime <= _currentTimeValue)
+            foreach (MidiEventData eventData in _registrantsChangesBuffer)
             {
-                Bindings.GetInstance().DeviceController.OutputDevice.SendEvent(_registrantsChangesBuffer[_currentRegistrantIndex].Event);
-                _currentRegistrantIndex++;
-            }
-            //Check for page change events
-            if (_pageChangesBuffer.Count > _currentPageIndex && _pageChangesBuffer[_currentPageIndex].StartTimeStamp <= _currentTimeValue)
-            {
-                int pageNum = _pageChangesBuffer[_currentPageIndex].PageNumber;
-                if (_sheetPages.Count > pageNum)
+                if (eventData.GlobalTime >= _previousTimeValue && eventData.GlobalTime <= _currentTimeValue)
                 {
-                    Bindings.GetInstance().CurrentSheet = _sheetPages[pageNum];
-                    _currentPageIndex++;
+                    Bindings.GetInstance().DeviceController.OutputDevice.SendEvent(eventData.Event);
                 }
             }
-            
+            //Check for page change events
+            foreach (PageData page in _pageChangesBuffer)
+            {
+                if (page.StartTimeStamp <= _currentTimeValue && page.EndTimeStamp >= _currentTimeValue)
+                {
+                    Bindings.GetInstance().CurrentSheet = _sheetPages[page.PageNumber];
+                }
+            }
         }
         
         private void AddToMelodyBuffer(byte tone, uint timestamp)
