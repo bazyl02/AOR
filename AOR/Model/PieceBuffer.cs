@@ -6,6 +6,7 @@ using System.Windows.Media.Imaging;
 using Melanchall.DryWetMidi.Core;
 using Melanchall.DryWetMidi.Interaction;
 using System.Threading.Tasks;
+using System.Windows.Media;
 using Windows.Data.Pdf;
 using Windows.Storage.Streams;
 using AOR.ModelView;
@@ -57,9 +58,17 @@ namespace AOR.Model
             //Check for page change events
             foreach (PageData page in _pageChangesBuffer)
             {
+                
                 if (page.StartTimeStamp <= _currentTimeValue && page.EndTimeStamp >= _currentTimeValue)
                 {
+                    float value = 1.0f - (_currentTimeValue - page.StartTimeStamp *1.0f) / (page.EndTimeStamp - page.StartTimeStamp);
+                    Bindings.GetInstance().SheetWindow.MoveSheets(value);
+                } 
+                else if (page.EndTimeStamp <= _currentTimeValue && page.EndTimeStamp >= _previousTimeValue)
+                {
                     Bindings.GetInstance().CurrentSheet = _sheetPages[page.PageNumber];
+                    Bindings.GetInstance().NewSheet = _sheetPages.Count > page.PageNumber + 1 ? _sheetPages[page.PageNumber + 1] : null;
+                    Bindings.GetInstance().SheetWindow.ResetAll();
                 }
             }
         }
@@ -163,7 +172,7 @@ namespace AOR.Model
                 int rootPageNum = _pageChangesBuffer[0].PageNumber;
                 foreach (var page in _pageChangesBuffer)
                 {
-                    page.PageNumber -= rootPageNum;
+                    page.PageNumber -= rootPageNum - 1;
                 }
             }
             _notesInProgress.Clear();

@@ -26,42 +26,55 @@ namespace AOR
             {
                 await Task.Delay(25);
             }
-            CorrectSecondary();
+            ResetSecondary();
         }
         
         private void OnSizeChanged(object sender, System.Windows.SizeChangedEventArgs e)
         {
-            CorrectSecondary();
+            ResetSecondary();
         }
 
         protected override async void OnStateChanged(EventArgs e)
         {
             await WaitForChange(SlidingSheet.ActualWidth);
         }
-
-        private void CorrectSecondary()
+        
+        private void ResetPrimary()
         {
-            double y = VisualTreeHelper.GetOffset(SlidingSheet).Y;
-            TranslateTransform transform = new TranslateTransform(ActualWidth * 0.5f + (SlidingSheet.ActualWidth == 0 ? ActualWidth : SlidingSheet.ActualWidth) * 0.5f,y);
-            SlidingSheet.RenderTransform = transform;
+            TranslateTransform transform = new TranslateTransform(0,0);
+            MainSheet.RenderTransform = transform;
         }
         
-        public void MoveTo(double newX, int time)
+        private void ResetSecondary()
         {
-            Image target = SlidingSheet;
-            var left = VisualTreeHelper.GetOffset(target).X;
-            TranslateTransform transform = new TranslateTransform();
-            target.RenderTransform = transform;
-            DoubleAnimation animX = new DoubleAnimation(0,newX - left, TimeSpan.FromMilliseconds(time));
-            transform.BeginAnimation(TranslateTransform.XProperty, animX);
-            transform.Y = 0;
+            TranslateTransform transform = new TranslateTransform(ActualWidth * 0.5f + (SlidingSheet.ActualWidth == 0 ? ActualWidth : SlidingSheet.ActualWidth) * 0.5f,0);
+            SlidingSheet.RenderTransform = transform;
         }
 
-        public void MoveSheets(float positionValue, int time)
+        public void ResetAll()
         {
-            Image main = MainSheet;
-            Image sliding = SlidingSheet;
-            
+            Dispatcher.Invoke(() =>
+            {
+                ResetPrimary();
+                ResetSecondary();
+            });
+        }
+        
+        public void MoveSheets(float positionValue)
+        {
+            double slidingX = (Canvas1.ActualWidth / 2.0 + SlidingSheet.ActualWidth / 2.0) * positionValue;
+            double offsetX = slidingX - SlidingSheet.ActualWidth;
+            Dispatcher.Invoke(() =>
+            {
+                if (offsetX < 0)
+                {
+                    TranslateTransform primaryTransform = new TranslateTransform(offsetX, 0);
+                    MainSheet.RenderTransform = primaryTransform;
+                }
+
+                TranslateTransform secondaryTransform = new TranslateTransform(slidingX, 0);
+                SlidingSheet.RenderTransform = secondaryTransform;
+            });
         }
         
         protected override void OnClosed(EventArgs e)
@@ -74,11 +87,9 @@ namespace AOR
                 playback.MoveToStart();
             }
         }
-
-        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
+        public void ButtonBase_OnClick(object sender, RoutedEventArgs e)
         {
             //MoveTo(0,2000);
-            CorrectSecondary();
         }
     }
 }
