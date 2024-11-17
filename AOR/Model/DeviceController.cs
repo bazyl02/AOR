@@ -46,6 +46,7 @@ namespace AOR.Model
         public void SetTrackForSimulatedInput(MidiFile track)
         {
             _globalTime = 0;
+            _globalRealTime = 0;
             SimulatedInput?.Dispose();
             SimulatedInput = OutputDevice != null ? track.GetPlayback(OutputDevice) : track.GetPlayback();
             SimulatedInput.EventPlayed += OnEventPlayed;

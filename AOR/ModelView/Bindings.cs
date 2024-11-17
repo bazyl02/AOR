@@ -33,7 +33,7 @@ namespace AOR.ModelView
 
         public SongList SongList;
 
-        public SheetWindow SheetWindow;
+        public SheetWindow SheetWindow = null;
         
         //Data stored for bindings
         private bool _fromFile = false;
@@ -95,17 +95,6 @@ namespace AOR.ModelView
                 _outputDeviceName = value;
                 OnPropertyChanged();
                 DeviceController.SetOutputDevice(_outputDeviceName);
-            }
-        }
-
-        private float _targetX;
-
-        public float TargetX
-        {
-            get => _targetX;
-            set
-            {
-                _targetX = value;
             }
         }
         
