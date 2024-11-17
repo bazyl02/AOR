@@ -33,9 +33,7 @@ namespace AOR.ModelView
 
         public SongList SongList;
 
-        public int TimeDivision = 96;
-        public long Tempo = 500000;
-        
+        public SheetWindow SheetWindow;
         
         //Data stored for bindings
         private bool _fromFile = false;

@@ -1,13 +1,13 @@
 ﻿using System;
-using System.Windows;
+using System.Threading.Tasks;
 using System.Windows.Media.Animation;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Media;
 using AOR.ModelView;
 using Melanchall.DryWetMidi.Multimedia;
 using Image = System.Windows.Controls.Image;
+using RoutedEventArgs = System.Windows.RoutedEventArgs;
 using TranslateTransform = System.Windows.Media.TranslateTransform;
 using VisualTreeHelper = System.Windows.Media.VisualTreeHelper;
+using Window = System.Windows.Window;
 
 namespace AOR
 {
@@ -17,21 +17,56 @@ namespace AOR
         {
             InitializeComponent();
             DataContext = Bindings.GetInstance();
+            SizeChanged += OnSizeChanged;
         }
 
-        public static void MoveTo(Image target, double newX, int time)
+        public async Task WaitForChange(double currentValue = 0)
         {
+            while (Math.Abs(SlidingSheet.ActualWidth - currentValue) < 0.0001f)
+            {
+                await Task.Delay(25);
+            }
+            CorrectSecondary();
+        }
+        
+        private void OnSizeChanged(object sender, System.Windows.SizeChangedEventArgs e)
+        {
+            CorrectSecondary();
+        }
+
+        protected override async void OnStateChanged(EventArgs e)
+        {
+            await WaitForChange(SlidingSheet.ActualWidth);
+        }
+
+        private void CorrectSecondary()
+        {
+            double y = VisualTreeHelper.GetOffset(SlidingSheet).Y;
+            TranslateTransform transform = new TranslateTransform(ActualWidth * 0.5f + (SlidingSheet.ActualWidth == 0 ? ActualWidth : SlidingSheet.ActualWidth) * 0.5f,y);
+            SlidingSheet.RenderTransform = transform;
+        }
+        
+        public void MoveTo(double newX, int time)
+        {
+            Image target = SlidingSheet;
             var left = VisualTreeHelper.GetOffset(target).X;
             TranslateTransform transform = new TranslateTransform();
             target.RenderTransform = transform;
             DoubleAnimation animX = new DoubleAnimation(0,newX - left, TimeSpan.FromMilliseconds(time));
             transform.BeginAnimation(TranslateTransform.XProperty, animX);
             transform.Y = 0;
+        }
+
+        public void MoveSheets(float positionValue, int time)
+        {
+            Image main = MainSheet;
+            Image sliding = SlidingSheet;
             
         }
         
         protected override void OnClosed(EventArgs e)
         {
+            Bindings.GetInstance().SheetWindow = null;
             if (Bindings.GetInstance().DeviceController.SimulatedInput != null)
             {
                 Playback playback = Bindings.GetInstance().DeviceController.SimulatedInput;
@@ -42,8 +77,8 @@ namespace AOR
 
         private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
         {
-            MoveTo(Image1,0,2000);
-            
+            //MoveTo(0,2000);
+            CorrectSecondary();
         }
     }
 }

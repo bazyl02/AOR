@@ -190,6 +190,7 @@ namespace AOR.Model
             }
             _sheetPages = output;
             if(_sheetPages.Count > 0) Bindings.GetInstance().CurrentSheet = _sheetPages[0];
+            Bindings.GetInstance().NewSheet = _sheetPages[1];
         }
     }
 }

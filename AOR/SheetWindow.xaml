@@ -20,8 +20,8 @@
         </Grid.ColumnDefinitions>
         
         <Canvas Name="Canvas1" Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Grid.ColumnSpan="2" Background="Gray">
-            <Image Name="Image1" Source="{Binding CurrentSheet}" Width="{Binding Path=ActualWidth, ElementName=Canvas1}" Height="{Binding Path=ActualHeight, ElementName=Canvas1}" Stretch="Uniform" ></Image>
-            <Image Name="Image2" Source="{Binding NewSheet}" Width="{Binding Path=ActualWidth, ElementName=Canvas1}" Height="{Binding Path=ActualHeight, ElementName=Canvas1}" Stretch="Uniform"/>
+            <Image Name="MainSheet" Source="{Binding CurrentSheet}" Width="{Binding Path=ActualWidth, ElementName=Canvas1}" Height="{Binding Path=ActualHeight, ElementName=Canvas1}" Stretch="Uniform" ></Image>
+            <Image Name="SlidingSheet" Source="{Binding NewSheet}" Width="{Binding Path=ActualWidth, ElementName=Canvas1}" Height="{Binding Path=ActualHeight, ElementName=Canvas1}" Stretch="Uniform"/>
         </Canvas>
         
         <Button Grid.Column="0" Grid.Row="0" Click="ButtonBase_OnClick"></Button>
