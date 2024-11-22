@@ -61,7 +61,7 @@ namespace AOR.ModelView
             }
         }
 
-        private SongManager.PieceData _selectedPiece;
+        private SongManager.PieceData _selectedPiece = null;
 
         public SongManager.PieceData SelectedPiece
         {
