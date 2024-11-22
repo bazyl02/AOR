@@ -84,6 +84,7 @@ namespace AOR.Model
                     highestRatioIndex = _highestRatioIndices[i];
                     smallestDiff = diff;
                 }
+                Console.WriteLine(@"Ratio: " + _highestRatios[i] + @" | Index: " + _highestRatioIndices[i]);
             }
             
             _previousHighestIndex = highestRatioIndex;

@@ -9,7 +9,7 @@ namespace AOR.Model
     {
         public const int UserBufferSize = 20;
         public const long TickResolution = 1000;
-        public const int MinimumBufferSize = 5;
+        public const int MinimumBufferSize = 10;
         
         public List<NoteLine> UserBuffer = new List<NoteLine>(UserBufferSize);
         private Dictionary<byte, NoteLine> _notesInProgress = new Dictionary<byte, NoteLine>();

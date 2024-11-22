@@ -13,6 +13,7 @@ namespace AOR.Model
         public OutputDevice OutputDevice = null;
 
         public Playback SimulatedInput = null;
+        private short _simulationDivision = 128;
         
         public void SetInputDevice(string name)
         {
@@ -49,6 +50,8 @@ namespace AOR.Model
             _globalRealTime = 0;
             SimulatedInput?.Dispose();
             SimulatedInput = OutputDevice != null ? track.GetPlayback(OutputDevice) : track.GetPlayback();
+            _simulationDivision = ((TicksPerQuarterNoteTimeDivision)track.TimeDivision).TicksPerQuarterNote;
+            Console.WriteLine(_simulationDivision);
             SimulatedInput.EventPlayed += OnEventPlayed;
         }
         
@@ -60,13 +63,15 @@ namespace AOR.Model
             Playback playback = (Playback)sender;
             MidiEventType type = args.Event.EventType;
             
+            
+            
             switch (type)
             {
                 case MidiEventType.NoteOn:
                     NoteOnEvent noteOnEvent = (NoteOnEvent)args.Event;
                     _globalTime += noteOnEvent.DeltaTime;
                     long tempoOn = playback.TempoMap.GetTempoAtTime(new MidiTimeSpan(_globalTime)).MicrosecondsPerQuarterNote;
-                    double dividerOn = (tempoOn / (128 * 1.0d)) / InputBuffer.TickResolution * 1.0d;
+                    double dividerOn = (tempoOn / (_simulationDivision * 1.0d)) / InputBuffer.TickResolution * 1.0d;
                     long timeOn = (long)Math.Round(noteOnEvent.DeltaTime * dividerOn);
                     _globalRealTime += timeOn;
                     Bindings.GetInstance().InputBuffer.BufferSimulatedInput(true,noteOnEvent.NoteNumber, noteOnEvent.DeltaTime);
@@ -75,7 +80,7 @@ namespace AOR.Model
                     NoteOffEvent noteOffEvent = (NoteOffEvent)args.Event;
                     _globalTime += noteOffEvent.DeltaTime;
                     long tempo = playback.TempoMap.GetTempoAtTime(new MidiTimeSpan(_globalTime)).MicrosecondsPerQuarterNote;
-                    double divider = (tempo / (128 * 1.0d)) / InputBuffer.TickResolution * 1.0d;
+                    double divider = (tempo / (_simulationDivision * 1.0d)) / InputBuffer.TickResolution * 1.0d;
                     long time = (long)Math.Round(noteOffEvent.DeltaTime * divider);
                     _globalRealTime += time;
                     Console.WriteLine(@"Simulated input time: " + _globalRealTime);

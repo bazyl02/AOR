@@ -56,6 +56,7 @@ namespace AOR.Model
                 }
             }
             //Check for page change events
+            int index = 0;
             foreach (PageData page in _pageChangesBuffer)
             {
                 
@@ -67,9 +68,10 @@ namespace AOR.Model
                 else if (page.EndTimeStamp <= _currentTimeValue && page.EndTimeStamp >= _previousTimeValue)
                 {
                     Bindings.GetInstance().CurrentSheet = _sheetPages[page.PageNumber];
-                    Bindings.GetInstance().NewSheet = _sheetPages.Count > page.PageNumber + 1 ? _sheetPages[page.PageNumber + 1] : null;
+                    Bindings.GetInstance().NewSheet = _pageChangesBuffer.Count < index + 1 ? _sheetPages[_pageChangesBuffer[index].PageNumber] : null;
                     Bindings.GetInstance().SheetWindow.ResetAll();
                 }
+                index++;
             }
         }
         
@@ -199,7 +201,7 @@ namespace AOR.Model
             }
             _sheetPages = output;
             if(_sheetPages.Count > 0) Bindings.GetInstance().CurrentSheet = _sheetPages[0];
-            Bindings.GetInstance().NewSheet = _sheetPages[1];
+            if(_sheetPages.Count > 1) Bindings.GetInstance().NewSheet = _sheetPages[1];
         }
     }
 }
