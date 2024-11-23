@@ -6,7 +6,6 @@ using System.Windows.Media.Imaging;
 using Melanchall.DryWetMidi.Core;
 using Melanchall.DryWetMidi.Interaction;
 using System.Threading.Tasks;
-using System.Windows.Media;
 using Windows.Data.Pdf;
 using Windows.Storage.Streams;
 using AOR.ModelView;
@@ -59,7 +58,6 @@ namespace AOR.Model
             int index = 0;
             foreach (PageData page in _pageChangesBuffer)
             {
-                
                 if (page.StartTimeStamp <= _currentTimeValue && page.EndTimeStamp >= _currentTimeValue)
                 {
                     float value = 1.0f - (_currentTimeValue - page.StartTimeStamp *1.0f) / (page.EndTimeStamp - page.StartTimeStamp);
@@ -68,7 +66,7 @@ namespace AOR.Model
                 else if (page.EndTimeStamp <= _currentTimeValue && page.EndTimeStamp >= _previousTimeValue)
                 {
                     Bindings.GetInstance().CurrentSheet = _sheetPages[page.PageNumber];
-                    Bindings.GetInstance().NewSheet = _pageChangesBuffer.Count < index + 1 ? _sheetPages[_pageChangesBuffer[index].PageNumber] : null;
+                    Bindings.GetInstance().NewSheet = _pageChangesBuffer.Count > index + 1 ? _sheetPages[_pageChangesBuffer[index + 1].PageNumber] : null;
                     Bindings.GetInstance().SheetWindow.ResetAll();
                 }
                 index++;

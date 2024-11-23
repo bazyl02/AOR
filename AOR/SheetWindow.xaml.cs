@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
-using System.Windows.Media.Animation;
 using AOR.ModelView;
 using Melanchall.DryWetMidi.Multimedia;
-using Image = System.Windows.Controls.Image;
-using RoutedEventArgs = System.Windows.RoutedEventArgs;
 using TranslateTransform = System.Windows.Media.TranslateTransform;
-using VisualTreeHelper = System.Windows.Media.VisualTreeHelper;
 using Window = System.Windows.Window;
 
 namespace AOR
@@ -71,7 +67,6 @@ namespace AOR
                     TranslateTransform primaryTransform = new TranslateTransform(offsetX, 0);
                     MainSheet.RenderTransform = primaryTransform;
                 }
-
                 TranslateTransform secondaryTransform = new TranslateTransform(slidingX, 0);
                 SlidingSheet.RenderTransform = secondaryTransform;
             });
@@ -86,10 +81,6 @@ namespace AOR
                 playback.Stop();
                 playback.MoveToStart();
             }
-        }
-        public void ButtonBase_OnClick(object sender, RoutedEventArgs e)
-        {
-            //MoveTo(0,2000);
         }
     }
 }

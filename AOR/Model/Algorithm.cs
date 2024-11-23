@@ -6,18 +6,15 @@ namespace AOR.Model
 {
     public class Algorithm
     {
-        private PieceBuffer _pieceBuffer;
-        private InputBuffer _inputBuffer;
+        private const float MinimumPer = 0.9f;
+        
+        private readonly PieceBuffer _pieceBuffer = Bindings.GetInstance().PieceBuffer;
+        private readonly InputBuffer _inputBuffer = Bindings.GetInstance().InputBuffer;
 
         private int _previousHighestIndex = 0;
-        private float[] _highestRatios = new float[3];
-        private int[] _highestRatioIndices = new int[3];
-        public Algorithm()
-        {
-            _pieceBuffer = Bindings.GetInstance().PieceBuffer;
-            _inputBuffer = Bindings.GetInstance().InputBuffer;
-        }
-        
+        private readonly float[] _highestRatios = new float[3];
+        private readonly int[] _highestRatioIndices = new int[3];
+
         public uint Run()
         {
             Stopwatch stopwatch = new Stopwatch();
@@ -79,10 +76,14 @@ namespace AOR.Model
             for (int i = 0; i < 3; i++)
             {
                 int diff = Math.Abs(_highestRatioIndices[i] - _previousHighestIndex);
-                if (smallestDiff > diff && _highestRatios[i] >= 0)
+                if (smallestDiff > diff && _highestRatios[i] >= 0 && _highestRatios[0] >= 0)
                 {
-                    highestRatioIndex = _highestRatioIndices[i];
-                    smallestDiff = diff;
+                    float per = _highestRatios[i] / _highestRatios[0];
+                    if (per >= MinimumPer)
+                    {
+                        highestRatioIndex = _highestRatioIndices[i];
+                        smallestDiff = diff;
+                    }
                 }
                 Console.WriteLine(@"Ratio: " + _highestRatios[i] + @" | Index: " + _highestRatioIndices[i]);
             }

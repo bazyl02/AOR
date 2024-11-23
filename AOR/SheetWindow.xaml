@@ -24,8 +24,6 @@
             <Image Name="SlidingSheet" Source="{Binding NewSheet}" Width="{Binding Path=ActualWidth, ElementName=Canvas1}" Height="{Binding Path=ActualHeight, ElementName=Canvas1}" Stretch="Uniform"/>
         </Canvas>
         
-        <Button Grid.Column="0" Grid.Row="0" Click="ButtonBase_OnClick"></Button>
-        
         <controls:PlaybackControls Grid.Column="1" Grid.Row="0"></controls:PlaybackControls>
     </Grid>
 </Window>
