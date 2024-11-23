@@ -7,13 +7,14 @@ namespace AOR.Model
     public class Algorithm
     {
         private const float MinimumPer = 0.9f;
+        private const int HighestAmount = 3;
         
         private readonly PieceBuffer _pieceBuffer = Bindings.GetInstance().PieceBuffer;
         private readonly InputBuffer _inputBuffer = Bindings.GetInstance().InputBuffer;
 
         private int _previousHighestIndex = 0;
-        private readonly float[] _highestRatios = new float[3];
-        private readonly int[] _highestRatioIndices = new int[3];
+        private readonly float[] _highestRatios = new float[HighestAmount];
+        private readonly int[] _highestRatioIndices = new int[HighestAmount];
 
         public uint Run()
         {
@@ -21,7 +22,7 @@ namespace AOR.Model
             stopwatch.Start();
             float highestRatio = 0;
             int highestRatioIndex = 0;
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < HighestAmount; i++)
             {
                 _highestRatios[i] = -1.0f;
             }
@@ -61,7 +62,7 @@ namespace AOR.Model
                 }
                 float totalSegmentRatio = sum / amount;
                 
-                for (int j = 0; j < 3; j++)
+                for (int j = 0; j < HighestAmount; j++)
                 {
                     if (_highestRatios[j] < totalSegmentRatio)
                     {
@@ -73,7 +74,7 @@ namespace AOR.Model
             }
 
             int smallestDiff = int.MaxValue;
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < HighestAmount; i++)
             {
                 int diff = Math.Abs(_highestRatioIndices[i] - _previousHighestIndex);
                 if (smallestDiff > diff && _highestRatios[i] >= 0 && _highestRatios[0] >= 0)
