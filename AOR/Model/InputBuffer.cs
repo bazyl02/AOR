@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using AOR.ModelView;
 
 namespace AOR.Model
@@ -19,6 +20,22 @@ namespace AOR.Model
         
         private Stopwatch _stopwatch = new Stopwatch();
         private long _previousGlobalTime = 0;
+
+        private void DumpUserBufferToReport()
+        {
+            StreamWriter report = Bindings.GetInstance().Report;
+            report.WriteLine("-------------------------------------");
+            report.WriteLine("USER BUFFER DATA START");
+            report.WriteLine("User buffer size: " + UserBuffer.Count);
+            report.WriteLine("Buffer start time: " + StartTimestamp);
+            report.WriteLine("Buffer end time: " + EndTimestamp);
+            for (int i = 0; i < UserBuffer.Count; i++)
+            {
+                report.WriteLine(UserBuffer[i] + @" | Index: " + i);
+            }
+            report.WriteLine("USER BUFFER DATA END");
+            report.WriteLine("-------------------------------------");
+        }
         
         private void BufferInput(byte tone, uint timestamp, bool noteOn)
         {
@@ -28,13 +45,16 @@ namespace AOR.Model
                  line.EndTime = timestamp;
                  _notesInProgress.Remove(tone);
                  EndTimestamp = timestamp;
+                 DumpUserBufferToReport();
                  if(MinimumBufferSize <= UserBuffer.Count)
                  {
                      uint runResult = Bindings.GetInstance().Algorithm.Run();
                      Bindings.GetInstance().PieceBuffer.CurrentTimeValue = runResult;
                      Console.WriteLine(@"Predicted time: " + runResult);
+                     Bindings.GetInstance().Report.WriteLine("Predicted time: " + runResult);
                  }
                  Console.WriteLine(@"----------------------------------------------");
+                 Bindings.GetInstance().Report.WriteLine("----------------------------------------------");
              }
              else
              {

@@ -12,5 +12,10 @@
             StartTime = start;
             EndTime = end;
         }
+
+        public override string ToString()
+        {
+            return @"Tone: " + Tone + @" | Start time: " + StartTime + @" | End time: " + EndTime;
+        }
     }
 }

@@ -25,6 +25,7 @@ namespace AOR
                 Bindings.GetInstance().SheetWindow.Close();
                 Bindings.GetInstance().SheetWindow = null;
             }
+            Bindings.GetInstance()?.Report.Close();
         }
     }
 }

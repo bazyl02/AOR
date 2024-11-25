@@ -63,8 +63,6 @@ namespace AOR.Model
             Playback playback = (Playback)sender;
             MidiEventType type = args.Event.EventType;
             
-            
-            
             switch (type)
             {
                 case MidiEventType.NoteOn:
@@ -84,6 +82,7 @@ namespace AOR.Model
                     long time = (long)Math.Round(noteOffEvent.DeltaTime * divider);
                     _globalRealTime += time;
                     Console.WriteLine(@"Simulated input time: " + _globalRealTime);
+                    Bindings.GetInstance().Report.WriteLine("Simulated input time: " + _globalRealTime);
                     Bindings.GetInstance().InputBuffer.BufferSimulatedInput(false,noteOffEvent.NoteNumber, noteOffEvent.DeltaTime);
                     break;
             }

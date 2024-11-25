@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using System;
+using System.IO;
+using System.Windows;
 using System.Windows.Controls;
 using AOR.Model;
 using AOR.ModelView;
@@ -29,6 +31,14 @@ namespace AOR.View.Controls
             await Bindings.GetInstance().SheetWindow.WaitForChange();
             Bindings.GetInstance().InputBuffer.Clear();
             Bindings.GetInstance().Algorithm = new Algorithm();
+            
+            var raportStream = Bindings.GetInstance().Report;
+            raportStream?.Close();
+            string docPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            Console.WriteLine(DateTime.Now.ToLongDateString());
+            raportStream = new StreamWriter(docPath + "/" + DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss") + "_" + Bindings.GetInstance().SelectedPiece.SongName +"_test.txt");
+            Bindings.GetInstance().Report = raportStream;
+            Bindings.GetInstance().PieceBuffer.DumpMelodyBufferToReport();
         }
     }
 }

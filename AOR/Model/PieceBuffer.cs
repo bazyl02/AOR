@@ -172,7 +172,7 @@ namespace AOR.Model
                 int rootPageNum = _pageChangesBuffer[0].PageNumber;
                 foreach (var page in _pageChangesBuffer)
                 {
-                    page.PageNumber -= rootPageNum - 1;
+                    page.PageNumber -= rootPageNum;
                 }
             }
             _notesInProgress.Clear();
@@ -200,6 +200,20 @@ namespace AOR.Model
             _sheetPages = output;
             if(_sheetPages.Count > 0) Bindings.GetInstance().CurrentSheet = _sheetPages[0];
             if(_sheetPages.Count > 1) Bindings.GetInstance().NewSheet = _sheetPages[1];
+        }
+
+        public void DumpMelodyBufferToReport()
+        {
+            StreamWriter report = Bindings.GetInstance().Report;
+            report.WriteLine("-------------------------------------");
+            report.WriteLine("MELODY DATA START");
+            report.WriteLine("Melody name: " + Bindings.GetInstance().SelectedPiece.SongName);
+            for (int i = 0; i < MelodyBuffer.Count; i++)
+            {
+                report.WriteLine(MelodyBuffer[i] + @" | Index: " + i);
+            }
+            report.WriteLine("MELODY DATA END");
+            report.WriteLine("-------------------------------------");
         }
     }
 }

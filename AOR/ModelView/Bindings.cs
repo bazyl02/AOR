@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.IO;
 using System.Runtime.CompilerServices;
 using AOR.Model;
 using AOR.View.Controls;
@@ -33,6 +34,8 @@ namespace AOR.ModelView
         public SongList SongList;
 
         public SheetWindow SheetWindow = null;
+
+        public StreamWriter Report = null;
         
         //Data stored for bindings
         private bool _fromFile = false;

@@ -7,7 +7,7 @@ namespace AOR.Model
     public class Algorithm
     {
         private const float MinimumPer = 0.9f;
-        private const int HighestAmount = 3;
+        private const int HighestAmount = 6;
         
         private readonly PieceBuffer _pieceBuffer = Bindings.GetInstance().PieceBuffer;
         private readonly InputBuffer _inputBuffer = Bindings.GetInstance().InputBuffer;
@@ -30,6 +30,7 @@ namespace AOR.Model
             for (int i = 0; i < _pieceBuffer.MelodyBuffer.Count; i++)
             {
                 uint bufferTime = _pieceBuffer.MelodyBuffer[i].EndTime;
+                if(bufferTime < _inputBuffer.EndTimestamp - _inputBuffer.StartTimestamp) continue;
                 float sum = 0;
                 int amount = 0;
                 for (int j = i; j >= 0; j--)
@@ -61,18 +62,25 @@ namespace AOR.Model
                     amount++;
                 }
                 float totalSegmentRatio = sum / amount;
-                
                 for (int j = 0; j < HighestAmount; j++)
                 {
                     if (_highestRatios[j] < totalSegmentRatio)
                     {
-                        _highestRatios[j] = totalSegmentRatio;
-                        _highestRatioIndices[j] = i;
+                        float newRatio = totalSegmentRatio;
+                        int newIndex = i;
+                        for (int k = j; k < HighestAmount; k++)
+                        {
+                            float oldRatio = _highestRatios[k];
+                            int oldIndex = _highestRatioIndices[k];
+                            _highestRatios[k] = newRatio;
+                            _highestRatioIndices[k] = newIndex;
+                            newRatio = oldRatio;
+                            newIndex = oldIndex;
+                        }
                         break;
                     }
                 }
             }
-
             int smallestDiff = int.MaxValue;
             for (int i = 0; i < HighestAmount; i++)
             {
@@ -87,11 +95,14 @@ namespace AOR.Model
                     }
                 }
                 Console.WriteLine(@"Ratio: " + _highestRatios[i] + @" | Index: " + _highestRatioIndices[i]);
+                Bindings.GetInstance().Report.WriteLine("Ratio: " + _highestRatios[i] + " | Index: " + _highestRatioIndices[i]);
             }
             
             _previousHighestIndex = highestRatioIndex;
             Console.WriteLine(@"Index: " + _previousHighestIndex + @" smallest diff: " + smallestDiff);
             Console.WriteLine(@"Function time: " + stopwatch.ElapsedTicks / (Stopwatch.Frequency / 1000f) + @"ms");
+            Bindings.GetInstance().Report.WriteLine("Index: " + _previousHighestIndex + " smallest diff: " + smallestDiff);
+            Bindings.GetInstance().Report.WriteLine("Function time: " + stopwatch.ElapsedTicks / (Stopwatch.Frequency / 1000f) + "ms");
             stopwatch.Stop();
             return _pieceBuffer.MelodyBuffer[highestRatioIndex].EndTime;
         }
