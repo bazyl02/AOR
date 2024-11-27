@@ -13,7 +13,7 @@ namespace AOR.Model
         #if !StaticWindowSize
             private const float WindowSize = 0.5f;
         #else 
-            private const int WindowSize = 256;
+            private const int WindowSize = 512;
         #endif
         
         private readonly PieceBuffer _pieceBuffer = Bindings.GetInstance().PieceBuffer;
