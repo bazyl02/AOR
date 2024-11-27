@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define StaticWindowSize
+
+using System;
 using System.Diagnostics;
 using AOR.ModelView;
 
@@ -8,11 +10,16 @@ namespace AOR.Model
     {
         private const float MinimumPer = 0.9f;
         private const int HighestAmount = 6;
+        #if !StaticWindowSize
+            private const float WindowSize = 0.5f;
+        #else 
+            private const int WindowSize = 256;
+        #endif
         
         private readonly PieceBuffer _pieceBuffer = Bindings.GetInstance().PieceBuffer;
         private readonly InputBuffer _inputBuffer = Bindings.GetInstance().InputBuffer;
 
-        private int _previousHighestIndex = 0;
+        private int _previousHighestIndex = -1;
         private readonly float[] _highestRatios = new float[HighestAmount];
         private readonly int[] _highestRatioIndices = new int[HighestAmount];
 
@@ -26,8 +33,15 @@ namespace AOR.Model
             {
                 _highestRatios[i] = -1.0f;
             }
-            
-            for (int i = 0; i < _pieceBuffer.MelodyBuffer.Count; i++)
+#if !StaticWindowSize
+            int windowSpan = (int)(_pieceBuffer.MelodyBuffer.Count * WindowSize);
+            int startIndex = Math.Max(_previousHighestIndex - windowSpan,0);
+            int endIndex = Math.Min(_previousHighestIndex + windowSpan,_pieceBuffer.MelodyBuffer.Count);
+#else
+            int startIndex = Math.Max(_previousHighestIndex - WindowSize,0);
+            int endIndex = Math.Min(_previousHighestIndex + WindowSize,_pieceBuffer.MelodyBuffer.Count);
+#endif
+            for (int i = startIndex; i < endIndex; i++)
             {
                 uint bufferTime = _pieceBuffer.MelodyBuffer[i].EndTime;
                 if(bufferTime < _inputBuffer.EndTimestamp - _inputBuffer.StartTimestamp) continue;
