@@ -9,12 +9,10 @@ namespace AOR.Model
     public class Algorithm
     {
         private const float MinimumPer = 0.9f;
-        private const int HighestAmount = 6;
-        #if !StaticWindowSize
-            private const float WindowSize = 0.5f;
-        #else 
-            private const int WindowSize = 512;
-        #endif
+        private const int HighestAmount = 10;
+
+        private const int FrontSize = 512;
+        private const int BehindSize = 32;
         
         private readonly PieceBuffer _pieceBuffer = Bindings.GetInstance().PieceBuffer;
         private readonly InputBuffer _inputBuffer = Bindings.GetInstance().InputBuffer;
@@ -33,14 +31,8 @@ namespace AOR.Model
             {
                 _highestRatios[i] = -1.0f;
             }
-#if !StaticWindowSize
-            int windowSpan = (int)(_pieceBuffer.MelodyBuffer.Count * WindowSize);
-            int startIndex = Math.Max(_previousHighestIndex - windowSpan,0);
-            int endIndex = Math.Min(_previousHighestIndex + windowSpan,_pieceBuffer.MelodyBuffer.Count);
-#else
-            int startIndex = Math.Max(_previousHighestIndex - WindowSize,0);
-            int endIndex = Math.Min(_previousHighestIndex + WindowSize,_pieceBuffer.MelodyBuffer.Count);
-#endif
+            int startIndex = Math.Max(_previousHighestIndex - BehindSize,0);
+            int endIndex = Math.Min(_previousHighestIndex + FrontSize,_pieceBuffer.MelodyBuffer.Count);
             for (int i = startIndex; i < endIndex; i++)
             {
                 uint bufferTime = _pieceBuffer.MelodyBuffer[i].EndTime;

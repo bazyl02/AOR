@@ -61,9 +61,17 @@ namespace AOR.Model
                  if (noteOn)
                  {
                      NoteLine newNoteLine = new NoteLine(tone, timestamp, 0);
-                     if (UserBuffer.Count >= UserBufferSize) UserBuffer.RemoveAt(0);
+                     //if (UserBuffer.Count >= UserBufferSize) UserBuffer.RemoveAt(0);
+                     for (int i = 0; i < UserBuffer.Count - UserBufferSize; i++)
+                     {
+                         if (UserBuffer[i].EndTime < UserBuffer[UserBuffer.Count - UserBufferSize].StartTime)
+                         {
+                             UserBuffer.RemoveAt(i);
+                             i--;
+                         }
+                     }
                      UserBuffer.Add(newNoteLine);
-                     StartTimestamp = UserBuffer[0].StartTime;
+                     StartTimestamp = UserBuffer[UserBuffer.Count - UserBufferSize > 0 ? UserBuffer.Count - UserBufferSize : 0].StartTime;
                      _notesInProgress.Add(tone, newNoteLine);
                  }
              }
