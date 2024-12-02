@@ -8,11 +8,13 @@ namespace AOR.Model
 {
     public class Algorithm
     {
-        private const float MinimumPer = 0.85f;
-        private const int HighestAmount = 10;
+        private const float MinimumPer = 0.9f;
+        private const int HighestAmount = 15;
 
         private const int FrontSize = 512;
         private const int BehindSize = 32;
+
+        private const int GraceValue = 10;
         
         private readonly PieceBuffer _pieceBuffer = Bindings.GetInstance().PieceBuffer;
         private readonly InputBuffer _inputBuffer = Bindings.GetInstance().InputBuffer;
@@ -44,7 +46,7 @@ namespace AOR.Model
                     //Translate timestamps from global space to local buffer space
                     uint melodyLocalStart = bufferTime - melody.StartTime;
                     uint melodyLocalEnd = melody.EndTime > bufferTime ? 0 : bufferTime - melody.EndTime;
-                    if(melodyLocalStart > _inputBuffer.EndTimestamp - _inputBuffer.StartTimestamp) break;
+                    if(melodyLocalStart > _inputBuffer.EndTimestamp - _inputBuffer.StartTimestamp - GraceValue) break;
                     float ratio = 0;
                     for (int k = _inputBuffer.UserBuffer.Count - 1; k >= 0; k--)
                     {
