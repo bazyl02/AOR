@@ -91,7 +91,7 @@ namespace AOR.Model
                     Bindings.GetInstance().Report.WriteLine("Simulated input time: " + _globalRealTime);
 #endif
 #if TEST
-                    SimulationTime = (long)(_globalRealTime * Speed);
+                    SimulationTime = _globalRealTime;
 #endif
                     Bindings.GetInstance().InputBuffer.BufferSimulatedInput(false,noteOffEvent.NoteNumber, noteOffEvent.DeltaTime);
                     break;
