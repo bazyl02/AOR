@@ -14,6 +14,12 @@ namespace AOR.Model
 
         public Playback SimulatedInput = null;
         private short _simulationDivision = 128;
+        public const double Speed = 1.0;
+        
+#if TEST
+        public string SimulationName = null;
+        public long SimulationTime = 0;
+#endif
         
         public void SetInputDevice(string name)
         {
@@ -44,17 +50,17 @@ namespace AOR.Model
             OutputDevice.EventSent += OnEventSent;
         }
         
-        public void SetTrackForSimulatedInput(MidiFile track)
+        public void SetTrackForSimulatedInput(MidiFile track, string name)
         {
             _globalTime = 0;
             _globalRealTime = 0;
             SimulatedInput?.Dispose();
             SimulatedInput = OutputDevice != null ? track.GetPlayback(OutputDevice) : track.GetPlayback();
+            SimulationName = name;
             _simulationDivision = ((TicksPerQuarterNoteTimeDivision)track.TimeDivision).TicksPerQuarterNote;
-            Console.WriteLine(_simulationDivision);
+            SimulatedInput.Speed = Speed;
             SimulatedInput.EventPlayed += OnEventPlayed;
         }
-        
         
         private long _globalTime = 0;
         private long _globalRealTime = 0;
@@ -62,7 +68,6 @@ namespace AOR.Model
         {
             Playback playback = (Playback)sender;
             MidiEventType type = args.Event.EventType;
-            
             switch (type)
             {
                 case MidiEventType.NoteOn:
@@ -82,7 +87,12 @@ namespace AOR.Model
                     long time = (long)Math.Round(noteOffEvent.DeltaTime * divider);
                     _globalRealTime += time;
                     Console.WriteLine(@"Simulated input time: " + _globalRealTime);
+#if DUMP
                     Bindings.GetInstance().Report.WriteLine("Simulated input time: " + _globalRealTime);
+#endif
+#if TEST
+                    SimulationTime = (long)(_globalRealTime * Speed);
+#endif
                     Bindings.GetInstance().InputBuffer.BufferSimulatedInput(false,noteOffEvent.NoteNumber, noteOffEvent.DeltaTime);
                     break;
             }

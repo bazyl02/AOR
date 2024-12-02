@@ -1,4 +1,4 @@
-﻿#define StaticWindowSize
+﻿//#define ShowRatioArray
 
 using System;
 using System.Diagnostics;
@@ -8,7 +8,7 @@ namespace AOR.Model
 {
     public class Algorithm
     {
-        private const float MinimumPer = 0.9f;
+        private const float MinimumPer = 0.85f;
         private const int HighestAmount = 10;
 
         private const int FrontSize = 512;
@@ -25,7 +25,6 @@ namespace AOR.Model
         {
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
-            float highestRatio = 0;
             int highestRatioIndex = 0;
             for (int i = 0; i < HighestAmount; i++)
             {
@@ -100,15 +99,21 @@ namespace AOR.Model
                         smallestDiff = diff;
                     }
                 }
+#if ShowRatioArray
                 Console.WriteLine(@"Ratio: " + _highestRatios[i] + @" | Index: " + _highestRatioIndices[i]);
+#endif
+#if DUMP
                 Bindings.GetInstance().Report.WriteLine("Ratio: " + _highestRatios[i] + " | Index: " + _highestRatioIndices[i]);
+#endif
             }
             
             _previousHighestIndex = highestRatioIndex;
             Console.WriteLine(@"Index: " + _previousHighestIndex + @" smallest diff: " + smallestDiff);
             Console.WriteLine(@"Function time: " + stopwatch.ElapsedTicks / (Stopwatch.Frequency / 1000f) + @"ms");
+#if DUMP
             Bindings.GetInstance().Report.WriteLine("Index: " + _previousHighestIndex + " smallest diff: " + smallestDiff);
             Bindings.GetInstance().Report.WriteLine("Function time: " + stopwatch.ElapsedTicks / (Stopwatch.Frequency / 1000f) + "ms");
+#endif
             stopwatch.Stop();
             return _pieceBuffer.MelodyBuffer[highestRatioIndex].EndTime;
         }

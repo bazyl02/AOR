@@ -35,7 +35,13 @@ namespace AOR.ModelView
 
         public SheetWindow SheetWindow = null;
 
+#if DUMP
         public StreamWriter Report = null;
+#endif
+        
+#if TEST
+        public StreamWriter TestResult = null;
+#endif
         
         //Data stored for bindings
         private bool _fromFile = false;

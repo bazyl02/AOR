@@ -21,6 +21,7 @@ namespace AOR.Model
         private Stopwatch _stopwatch = new Stopwatch();
         private long _previousGlobalTime = 0;
 
+#if DUMP
         private void DumpUserBufferToReport()
         {
             StreamWriter report = Bindings.GetInstance().Report;
@@ -36,6 +37,7 @@ namespace AOR.Model
             report.WriteLine("USER BUFFER DATA END");
             report.WriteLine("-------------------------------------");
         }
+#endif
         
         private void BufferInput(byte tone, uint timestamp, bool noteOn)
         {
@@ -45,16 +47,26 @@ namespace AOR.Model
                  line.EndTime = timestamp;
                  _notesInProgress.Remove(tone);
                  EndTimestamp = timestamp;
+#if DUMP
                  DumpUserBufferToReport();
+#endif
                  if(MinimumBufferSize <= UserBuffer.Count)
                  {
                      uint runResult = Bindings.GetInstance().Algorithm.Run();
                      Bindings.GetInstance().PieceBuffer.CurrentTimeValue = runResult;
                      Console.WriteLine(@"Predicted time: " + runResult);
+#if DUMP
                      Bindings.GetInstance().Report.WriteLine("Predicted time: " + runResult);
+#endif
+#if TEST
+                     long simTime = Bindings.GetInstance().DeviceController.SimulationTime;
+                     Bindings.GetInstance().TestResult.WriteLine("Simulation Time: " + simTime + " | Predicted Time: " + runResult + " | Difference: " + (runResult - simTime));
+#endif
                  }
                  Console.WriteLine(@"----------------------------------------------");
+#if DUMP
                  Bindings.GetInstance().Report.WriteLine("----------------------------------------------");
+#endif
              }
              else
              {
@@ -84,7 +96,6 @@ namespace AOR.Model
             if (on)
             {
                 Console.WriteLine(@"Received Note On event. Tone: " + tone + @" | DeltaTime: " + ticks);
-                
             }
             else
             {

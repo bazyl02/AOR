@@ -202,6 +202,7 @@ namespace AOR.Model
             if(_sheetPages.Count > 1) Bindings.GetInstance().NewSheet = _sheetPages[1];
         }
 
+#if DUMP
         public void DumpMelodyBufferToReport()
         {
             StreamWriter report = Bindings.GetInstance().Report;
@@ -215,5 +216,6 @@ namespace AOR.Model
             report.WriteLine("MELODY DATA END");
             report.WriteLine("-------------------------------------");
         }
+#endif
     }
 }

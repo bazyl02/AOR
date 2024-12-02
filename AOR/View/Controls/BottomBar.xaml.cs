@@ -25,19 +25,29 @@ namespace AOR.View.Controls
                 return;
             }
             SheetWindow win2 = new SheetWindow();
+            Bindings.GetInstance().InputBuffer.Clear();
             Bindings.GetInstance().ProcessSelectedPiece(); 
             Bindings.GetInstance().SheetWindow = win2;
             win2.Show();
             await Bindings.GetInstance().SheetWindow.WaitForChange();
-            Bindings.GetInstance().InputBuffer.Clear();
             Bindings.GetInstance().Algorithm = new Algorithm();
             
+#if DUMP
             var raportStream = Bindings.GetInstance().Report;
             raportStream?.Close();
             string docPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            raportStream = new StreamWriter(docPath + "/" + DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss") + "_" + Bindings.GetInstance().SelectedPiece.SongName +"_test.txt");
+            raportStream = new StreamWriter(docPath + "/" + DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss") + "_" + Bindings.GetInstance().SelectedPiece.SongName +"_dump.txt");
             Bindings.GetInstance().Report = raportStream;
             Bindings.GetInstance().PieceBuffer.DumpMelodyBufferToReport();
+#endif
+            
+#if TEST
+            var testStream = Bindings.GetInstance().TestResult;
+            testStream?.Close();
+            string path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            testStream = new StreamWriter(path + "/" + DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss") + "_" + Bindings.GetInstance().DeviceController.SimulationName + "_Test.txt");
+            Bindings.GetInstance().TestResult = testStream;
+#endif
         }
     }
 }
