@@ -11,7 +11,7 @@ namespace AOR.Model
         private const float MinimumPer = 0.9f;
         private const int HighestAmount = 15;
 
-        private const int FrontSize = 512;
+        private const int FrontSize = 256;
         private const int BehindSize = 32;
 
         private const int GraceValue = 10;

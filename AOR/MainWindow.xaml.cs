@@ -26,10 +26,10 @@ namespace AOR
                 Bindings.GetInstance().SheetWindow = null;
             }
 #if DUMP
-            Bindings.GetInstance()?.Report.Close();
+            Bindings.GetInstance()?.Report?.Close();
 #endif
 #if TEST
-            Bindings.GetInstance()?.TestResult.Close();
+            Bindings.GetInstance()?.TestResult?.Close();
 #endif
         }
     }
