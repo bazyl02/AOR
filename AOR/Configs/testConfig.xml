@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<instrumentConfig>
+    <inputNum>1</inputNum>
+    <outputNum>1</outputNum>
+    <inputs>
+        <!--
+        <input>
+            <id>0</id>
+            <name>Casio USB-MIDI</name>
+        </input>
+        -->
+        <input>
+            <id>0</id>
+            <name>From File</name>
+        </input>
+    </inputs>
+    <outputs>
+        <output>
+            <id>0</id>
+            <name>Microsoft GS Wavetable Synth</name>
+            <usesTranslation>False</usesTranslation>
+            <translations>
+                <translation>
+                    <originalCode>5</originalCode>
+                    <targetCode>1</targetCode>
+                </translation>
+            </translations>
+        </output>
+        <!--
+        <output>
+            <id>0</id>
+            <name>Microsoft GS Wavetable Synth</name>
+            <usesTranslation>False</usesTranslation>
+        </output>
+        -->
+    </outputs>
+    
+</instrumentConfig>
