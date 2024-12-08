@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
+using AOR.ModelView;
 using Microsoft.Win32;
 
 namespace AOR.View.Controls
@@ -23,7 +24,7 @@ namespace AOR.View.Controls
             bool? success = fileDialog.ShowDialog();
             if (success == true)
             {
-                Console.WriteLine(fileDialog.FileName);
+                Bindings.GetInstance().DeviceController.LoadDeviceConfig(fileDialog.FileName);
             }
         }
     }

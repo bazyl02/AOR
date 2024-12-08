@@ -1,24 +1,37 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <instrumentConfig>
     <configName>testConfig</configName>
-    <inputUsesMultiChannel>No</inputUsesMultiChannel>
+    <inputUsesMultiChannel>Yes</inputUsesMultiChannel>
     <inputs>
         <input>
-            <name>From File</name>
-            <offset>0</offset>
+            <name>???</name>
             <channels>
                 <channel>
                     <id>0</id>
                     <offset>0</offset>
                 </channel>
+                <channel>
+                    <id>1</id>
+                    <offset>1</offset>
+                </channel>
+                <channel>
+                    <id>5</id>
+                    <offset>2</offset>
+                </channel>
             </channels>
         </input>
     </inputs>
-    <outputUsesMultiChannel>No</outputUsesMultiChannel>
+    <outputUsesMultiChannel>Yes</outputUsesMultiChannel>
     <outputs>
         <output>
             <name>Microsoft GS Wavetable Synth</name>
             <offset>0</offset>
+            <channels>
+                <channel>
+                    <id>0</id>
+                    
+                </channel>
+            </channels>
             <usesTranslation>False</usesTranslation>
             <!--
             <translations>

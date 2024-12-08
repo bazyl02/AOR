@@ -17,9 +17,9 @@ namespace AOR.View.Controls
         private async void ButtonBase_OnClick(object sender, RoutedEventArgs e)
         {
             if (Bindings.GetInstance().SelectedPiece == null ||
-                Bindings.GetInstance().DeviceController.OutputDevice == null || (Bindings.GetInstance().FromFile
+                Bindings.GetInstance().DeviceController.OutputDevices.Count == 0|| (Bindings.GetInstance().FromFile
                     ? Bindings.GetInstance().DeviceController.SimulatedInput == null
-                    : Bindings.GetInstance().DeviceController.InputDevice == null))
+                    : Bindings.GetInstance().DeviceController.InputDevices.Count == 0))
             {
                 MessageBox.Show("Either output device, selected piece or " + (Bindings.GetInstance().FromFile ? "simulation input" : "input device") + " is missing!","Error!",MessageBoxButton.OK,MessageBoxImage.Error);
                 return;

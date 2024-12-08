@@ -15,7 +15,7 @@ namespace AOR.Model
     public class PieceBuffer
     {
         public readonly List<NoteLine> MelodyBuffer = new List<NoteLine>();
-        private readonly Dictionary<byte, NoteLine> _notesInProgress = new Dictionary<byte, NoteLine>();
+        private readonly Dictionary<short, NoteLine> _notesInProgress = new Dictionary<short, NoteLine>();
         
         private readonly List<MidiEventData> _registrantsChangesBuffer = new List<MidiEventData>();
         private List<PageData> _pageChangesBuffer = new List<PageData>();
@@ -51,7 +51,7 @@ namespace AOR.Model
             {
                 if (eventData.GlobalTime >= _previousTimeValue && eventData.GlobalTime <= _currentTimeValue)
                 {
-                    Bindings.GetInstance().DeviceController.OutputDevice.SendEvent(eventData.Event);
+                    Bindings.GetInstance().DeviceController.SendToOutput(eventData);
                 }
             }
             //Check for page change events
@@ -73,7 +73,7 @@ namespace AOR.Model
             }
         }
         
-        private void AddToMelodyBuffer(byte tone, uint timestamp)
+        private void AddToMelodyBuffer(short tone, uint timestamp)
         {
             bool result = _notesInProgress.TryGetValue(tone, out NoteLine line);
             if (result)

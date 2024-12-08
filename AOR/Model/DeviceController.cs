@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using AOR.ModelView;
+using System.Xml.Linq;
 using Melanchall.DryWetMidi.Core;
 using Melanchall.DryWetMidi.Interaction;
 using Melanchall.DryWetMidi.Multimedia;
@@ -9,6 +11,11 @@ namespace AOR.Model
 {
     public class DeviceController
     {
+        public List<InputDevice> InputDevices = new List<InputDevice>();
+        public List<OutputDevice> OutputDevices = new List<OutputDevice>();
+
+        public Dictionary<string, InputDeviceData> InputsOffsets = new Dictionary<string, InputDeviceData>();
+        
         public InputDevice InputDevice = null;
         public OutputDevice OutputDevice = null;
 
@@ -30,7 +37,6 @@ namespace AOR.Model
             if (name.Equals("From File"))
             {
                 Bindings.GetInstance().FromFile = true;
-                //SetSimulatedInput();
                 return;
             }
             Bindings.GetInstance().FromFile = false;
@@ -48,6 +54,11 @@ namespace AOR.Model
             OutputDevice = OutputDevice.GetByName(name);
             
             OutputDevice.EventSent += OnEventSent;
+        }
+
+        public void SendToOutput(MidiEventData data)
+        {
+            OutputDevices[0].SendEvent(data.Event);
         }
         
         public void SetTrackForSimulatedInput(MidiFile track, string name)
@@ -77,7 +88,7 @@ namespace AOR.Model
                     double dividerOn = (tempoOn / (_simulationDivision * 1.0d)) / InputBuffer.TickResolution * 1.0d;
                     long timeOn = (long)Math.Round(noteOnEvent.DeltaTime * dividerOn);
                     _globalRealTime += timeOn;
-                    Bindings.GetInstance().InputBuffer.BufferSimulatedInput(true,noteOnEvent.NoteNumber, noteOnEvent.DeltaTime);
+                    Bindings.GetInstance().InputBuffer.BufferSimulatedInput(true,noteOnEvent.NoteNumber);
                     break;
                 case MidiEventType.NoteOff:
                     NoteOffEvent noteOffEvent = (NoteOffEvent)args.Event;
@@ -93,7 +104,7 @@ namespace AOR.Model
 #if TEST
                     SimulationTime = _globalRealTime;
 #endif
-                    Bindings.GetInstance().InputBuffer.BufferSimulatedInput(false,noteOffEvent.NoteNumber, noteOffEvent.DeltaTime);
+                    Bindings.GetInstance().InputBuffer.BufferSimulatedInput(false,noteOffEvent.NoteNumber);
                     break;
             }
         }
@@ -132,6 +143,115 @@ namespace AOR.Model
             }
             output.Add("From File");
             return output;
+        }
+        
+        private static List<string> GetAllOutputDeviceNames()
+        {
+            List<string> output = new List<string>();
+            foreach (var device in OutputDevice.GetAll())
+            {
+                output.Add(device.Name);
+            }
+            return output;
+        }
+
+        public void LoadDeviceConfig(string path)
+        {
+            XDocument document;
+            try
+            {
+                document = XDocument.Load(path);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+            XElement root = document.Root;
+            if(root is null) return;
+            bool inputMultiChannel = root.Element("inputUsesMultiChannel")?.Value == "Yes";
+            bool outputMultiChannel = root.Element("outputUsesMultiChannel")?.Value == "Yes";
+            
+            InputDevices.Clear();
+            OutputDevices.Clear();
+            InputsOffsets.Clear();
+            
+            XElement inputs = root.Element("inputs");
+            if(inputs is null || !inputs.HasElements) return;
+            var inputDevices = inputs.Elements("input");
+            List<string> inputNames = GetAllInputDeviceNames();
+            foreach (XElement inputDevice in inputDevices)
+            {
+                string inputName = inputDevice.Element("name")?.Value;
+                if (inputName != null)
+                {
+                    if (inputName.Equals("From File"))
+                    {
+                        Bindings.GetInstance().FromFile = true;
+                        break;
+                    }
+                    Bindings.GetInstance().FromFile = false;
+                    if (inputNames.Contains(inputName))
+                    {
+                        InputDevice inputDev = InputDevice.GetByName(inputName);
+                        inputDev.EventReceived += OnEventReceived;
+                        InputDevices.Add(inputDev);
+                        if (inputMultiChannel)
+                        {
+                            XElement channelsElement = inputDevice.Element("channels");
+                            if(channelsElement == null) return;
+                            var channels = channelsElement.Elements("channel");
+                            InputDeviceData newInputDevice = new InputDeviceData(inputName, 0, true);
+                            InputsOffsets.Add(inputName,newInputDevice);
+                            foreach (XElement channel in channels)
+                            {
+                                XElement idElement = channel.Element("id");
+                                if(idElement == null) return;
+                                int channelId = int.Parse(idElement.Value); 
+                                XElement offsetElement = inputDevice.Element("offset");
+                                if(offsetElement is null) return;
+                                int offset = int.Parse(offsetElement.Value); 
+                                newInputDevice.ChannelsOffsets.Add(channelId,offset);
+                            }
+                        }
+                        else
+                        {
+                            XElement offsetElement = inputDevice.Element("offset");
+                            if(offsetElement is null) return;
+                            int offset = int.Parse(offsetElement.Value); 
+                            InputsOffsets.Add(inputName,new InputDeviceData(inputName,offset,false));
+                        }
+                    }
+                    else
+                    {
+                        throw new InvalidDataException("Couldn't find the device: " + inputName);
+                    }
+                }
+            }
+            
+            XElement outputs = root.Element("outputs");
+            if(outputs is null || !outputs.HasElements) return;
+            var outputDevices = outputs.Elements("output");
+            List<string> outputNames = GetAllOutputDeviceNames();
+            foreach (XElement outputDevice in outputDevices)
+            {
+                string outputName = outputDevice.Element("name")?.Value;
+                Console.WriteLine(outputName);
+                if (outputName != null && outputNames.Contains(outputName))
+                {
+                    OutputDevice outputDev = OutputDevice.GetByName(outputName);
+                    outputDev.EventSent += OnEventSent;
+                    OutputDevices.Add(outputDev);
+                    if (outputMultiChannel)
+                    {
+                        
+                    }
+                    else
+                    {
+                        
+                    }
+                }
+            }
         }
     }
 }
