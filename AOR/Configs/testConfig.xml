@@ -6,28 +6,17 @@
         <input>
             <name>From File</name>
             <offset>0</offset>
-            <channels>
-                <channel>
-                    <id>0</id>
-                    <offset>0</offset>
-                </channel>
-            </channels>
+            <soundOutput>Microsoft GS Wavetable Synth</soundOutput>
         </input>
     </inputs>
     <outputUsesMultiChannel>No</outputUsesMultiChannel>
     <outputs>
+        <!--
         <output>
             <name>Microsoft GS Wavetable Synth</name>
-            <offset>0</offset>
-            <usesTranslation>False</usesTranslation>
-            <!--
-            <translations>
-                <translation>
-                    <originalCode>5</originalCode>
-                    <targetCode>1</targetCode>
-                </translation>
-            </translations>
-            -->
+            <deviceID>0</deviceID>
+            <globalID>0</globalID>
         </output>
+        -->
     </outputs>
 </instrumentConfig>

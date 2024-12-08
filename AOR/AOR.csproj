@@ -74,6 +74,7 @@
         <Compile Include="Model\InputBuffer.cs" />
         <Compile Include="Model\MidiEventData.cs" />
         <Compile Include="Model\NoteLine.cs" />
+        <Compile Include="Model\ChannelIDLink.cs" />
         <Compile Include="Model\PageData.cs" />
         <Compile Include="Model\PieceBuffer.cs" />
         <Compile Include="Model\SongManager.cs" />

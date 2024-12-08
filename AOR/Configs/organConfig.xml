@@ -21,25 +21,19 @@
             </channels>
         </input>
     </inputs>
-    <outputUsesMultiChannel>Yes</outputUsesMultiChannel>
+    <outputUsesMultiChannel>No</outputUsesMultiChannel>
     <outputs>
         <output>
             <name>Microsoft GS Wavetable Synth</name>
-            <offset>0</offset>
+            <deviceID>0</deviceID>
+            <globalID>0</globalID>
+            <!--
             <channels>
                 <channel>
-                    <id>0</id>
-                    
+                    <channelID>0</channelID>
+                    <globalID>0</globalID>
                 </channel>
             </channels>
-            <usesTranslation>False</usesTranslation>
-            <!--
-            <translations>
-                <translation>
-                    <originalCode>5</originalCode>
-                    <targetCode>1</targetCode>
-                </translation>
-            </translations>
             -->
         </output>
     </outputs>

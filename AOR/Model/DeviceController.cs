@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using AOR.ModelView;
 using System.Xml.Linq;
+using Melanchall.DryWetMidi.Common;
 using Melanchall.DryWetMidi.Core;
 using Melanchall.DryWetMidi.Interaction;
 using Melanchall.DryWetMidi.Multimedia;
@@ -11,14 +13,22 @@ namespace AOR.Model
 {
     public class DeviceController
     {
+        private sealed class TimedEventWithTrackChunk : TimedEvent, IMetadata
+        {
+            public object Metadata { get; set; }
+            public TimedEventWithTrackChunk(MidiEvent midiEvent, long time, int trackChunkIndex) : base(midiEvent, time)
+            {
+                Metadata = trackChunkIndex;
+            }
+        }
+        
         public List<InputDevice> InputDevices = new List<InputDevice>();
         public List<OutputDevice> OutputDevices = new List<OutputDevice>();
 
         public Dictionary<string, InputDeviceData> InputsOffsets = new Dictionary<string, InputDeviceData>();
+        public Dictionary<int, ChannelIDLink> OutputsData = new Dictionary<int, ChannelIDLink>();
         
-        public InputDevice InputDevice = null;
-        public OutputDevice OutputDevice = null;
-
+        private OutputDevice SimulationSoundOutput = null;
         public Playback SimulatedInput = null;
         private short _simulationDivision = 128;
         public const double Speed = 1.0;
@@ -28,34 +38,6 @@ namespace AOR.Model
         public long SimulationTime = 0;
 #endif
         
-        public void SetInputDevice(string name)
-        {
-            if (InputDevice != null)
-            {
-                InputDevice.Dispose();
-            }
-            if (name.Equals("From File"))
-            {
-                Bindings.GetInstance().FromFile = true;
-                return;
-            }
-            Bindings.GetInstance().FromFile = false;
-            InputDevice = InputDevice.GetByName(name);
-            InputDevice.StartEventsListening();
-            InputDevice.EventReceived += OnEventReceived;
-        }
-        
-        public void SetOutputDevice(string name)
-        {
-            if (OutputDevice != null)
-            {
-                OutputDevice.Dispose();
-            }
-            OutputDevice = OutputDevice.GetByName(name);
-            
-            OutputDevice.EventSent += OnEventSent;
-        }
-
         public void SendToOutput(MidiEventData data)
         {
             OutputDevices[0].SendEvent(data.Event);
@@ -66,7 +48,11 @@ namespace AOR.Model
             _globalTime = 0;
             _globalRealTime = 0;
             SimulatedInput?.Dispose();
-            SimulatedInput = OutputDevice != null ? track.GetPlayback(OutputDevice) : track.GetPlayback();
+            var timedEvents = track.GetTrackChunks()
+                .SelectMany((c, i) => c.GetTimedEvents().Select(e => new TimedEventWithTrackChunk(e.Event, e.Time, i)))
+                .OrderBy(e => e.Time);
+            var tempoMap = track.GetTempoMap();
+            SimulatedInput = new Playback(timedEvents, tempoMap, SimulationSoundOutput);
             SimulationName = name;
             _simulationDivision = ((TicksPerQuarterNoteTimeDivision)track.TimeDivision).TicksPerQuarterNote;
             SimulatedInput.Speed = Speed;
@@ -112,19 +98,35 @@ namespace AOR.Model
         private void OnEventReceived(object sender, MidiEventReceivedEventArgs e)
         {
             var midiDevice = (MidiDevice)sender;
-            MidiEventType type = e.Event.EventType;
-            switch (type)
+            bool result = InputsOffsets.TryGetValue(midiDevice.Name, out InputDeviceData data);
+            if (result)
             {
-                case MidiEventType.NoteOn:
-                    NoteOnEvent noteOnEvent = (NoteOnEvent)e.Event;
-                    //Console.WriteLine("Note On event received from " + midiDevice.Name + " at " + DateTime.Now + " tone: " + noteOnEvent.NoteNumber);
-                    Bindings.GetInstance().InputBuffer.BufferUserInput(true,noteOnEvent.NoteNumber);
-                    break;
-                case MidiEventType.NoteOff:
-                    NoteOffEvent noteOffEvent = (NoteOffEvent)e.Event;
-                    //Console.WriteLine("Note Off event received from " + midiDevice.Name + " at " + DateTime.Now + " tone: " + noteOffEvent.NoteNumber);
-                    Bindings.GetInstance().InputBuffer.BufferUserInput(false,noteOffEvent.NoteNumber);
-                    break;
+                bool isNoteOn;
+                if (e.Event.EventType == MidiEventType.NoteOn)
+                {
+                    isNoteOn = true;
+                }
+                else if(e.Event.EventType == MidiEventType.NoteOff)
+                {
+                    isNoteOn = false;
+                }
+                else
+                {
+                    return;
+                }
+                NoteEvent noteEvent = (NoteEvent)e.Event;
+                if (data.UsesChannels)
+                {
+                    bool channelResult = data.ChannelsOffsets.TryGetValue(noteEvent.Channel, out int offset);
+                    if (channelResult)
+                    {
+                        Bindings.GetInstance().InputBuffer.BufferUserInput(isNoteOn,(short)(noteEvent.NoteNumber + 128 * offset));
+                    }
+                }
+                else
+                {
+                    Bindings.GetInstance().InputBuffer.BufferUserInput(isNoteOn,(short)(noteEvent.NoteNumber + 128 * data.Offset));
+                }
             }
         }
 
@@ -175,11 +177,13 @@ namespace AOR.Model
             InputDevices.Clear();
             OutputDevices.Clear();
             InputsOffsets.Clear();
+            OutputsData.Clear();
             
             XElement inputs = root.Element("inputs");
             if(inputs is null || !inputs.HasElements) return;
             var inputDevices = inputs.Elements("input");
             List<string> inputNames = GetAllInputDeviceNames();
+            List<string> outputNames = GetAllOutputDeviceNames();
             foreach (XElement inputDevice in inputDevices)
             {
                 string inputName = inputDevice.Element("name")?.Value;
@@ -188,6 +192,9 @@ namespace AOR.Model
                     if (inputName.Equals("From File"))
                     {
                         Bindings.GetInstance().FromFile = true;
+                        XElement soundOutputElement = inputDevice.Element("soundOutput");
+                        if(soundOutputElement is null || !outputNames.Contains(soundOutputElement.Value)) return;
+                        SimulationSoundOutput = OutputDevice.GetByName(soundOutputElement.Value);
                         break;
                     }
                     Bindings.GetInstance().FromFile = false;
@@ -232,8 +239,14 @@ namespace AOR.Model
             XElement outputs = root.Element("outputs");
             if(outputs is null || !outputs.HasElements) return;
             var outputDevices = outputs.Elements("output");
-            List<string> outputNames = GetAllOutputDeviceNames();
-            foreach (XElement outputDevice in outputDevices)
+            var xElements = outputDevices.ToList();
+            if(xElements.Count == 0) return;
+            for (int i = 0; i < xElements.Count; i++)
+            {
+                OutputDevices.Add(null);
+            }
+            
+            foreach (XElement outputDevice in xElements)
             {
                 string outputName = outputDevice.Element("name")?.Value;
                 Console.WriteLine(outputName);
@@ -241,14 +254,33 @@ namespace AOR.Model
                 {
                     OutputDevice outputDev = OutputDevice.GetByName(outputName);
                     outputDev.EventSent += OnEventSent;
-                    OutputDevices.Add(outputDev);
+                    
+                    XElement deviceIdElement = outputDevice.Element("deviceID");
+                    if(deviceIdElement is null) return;
+                    int id = int.Parse(deviceIdElement.Value);
+                    OutputDevices[id] = outputDev;
                     if (outputMultiChannel)
                     {
-                        
+                        XElement channelsElement = outputDevice.Element("channels");
+                        if(channelsElement == null) return;
+                        var channels = channelsElement.Elements("channel");
+                        foreach (XElement channel in channels)
+                        {
+                            XElement globalIdElement = channel.Element("globalID");
+                            if(globalIdElement is null) return;
+                            int ID = int.Parse(globalIdElement.Value);
+                            XElement channelIdElement = channel.Element("channelID");
+                            if(channelIdElement is null) return;
+                            int channelId = int.Parse(channelIdElement.Value);
+                            OutputsData.Add(ID,new ChannelIDLink(true,id,channelId));
+                        }
                     }
                     else
                     {
-                        
+                        XElement globalIdElement = outputDevice.Element("globalID");
+                        if(globalIdElement is null) return;
+                        int ID = int.Parse(globalIdElement.Value);
+                        OutputsData.Add(ID,new ChannelIDLink(false,id,-1));
                     }
                 }
             }

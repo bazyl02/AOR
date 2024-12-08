@@ -89,7 +89,6 @@ namespace AOR.ModelView
             {
                 _inputDeviceName = value;
                 OnPropertyChanged();
-                DeviceController.SetInputDevice(_inputDeviceName);
             }
         }
         
@@ -102,7 +101,6 @@ namespace AOR.ModelView
             {
                 _outputDeviceName = value;
                 OnPropertyChanged();
-                DeviceController.SetOutputDevice(_outputDeviceName);
             }
         }
         
