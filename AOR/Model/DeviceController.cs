@@ -22,28 +22,54 @@ namespace AOR.Model
             }
         }
         
-        public List<InputDevice> InputDevices = new List<InputDevice>();
-        public List<OutputDevice> OutputDevices = new List<OutputDevice>();
+        private readonly List<InputDevice> _inputDevices = new List<InputDevice>();
+        private readonly List<OutputDevice> _outputDevices = new List<OutputDevice>();
 
-        public Dictionary<string, InputDeviceData> InputsOffsets = new Dictionary<string, InputDeviceData>();
-        public Dictionary<int, ChannelIDLink> OutputsData = new Dictionary<int, ChannelIDLink>();
+        private readonly Dictionary<string, InputDeviceData> _inputsOffsets = new Dictionary<string, InputDeviceData>();
+        private readonly Dictionary<int, ChannelIdLink> _outputsData = new Dictionary<int, ChannelIdLink>();
+
+        private readonly Dictionary<int, PieceBuffer.TrackData> _simulationOffsets =
+            new Dictionary<int, PieceBuffer.TrackData>();
         
-        private OutputDevice SimulationSoundOutput = null;
-        public Playback SimulatedInput = null;
+        private OutputDevice _simulationSoundOutput ;
+        public Playback SimulatedInput;
         private short _simulationDivision = 128;
-        public const double Speed = 1.0;
+        private const double Speed = 1.0;
         
 #if TEST
-        public string SimulationName = null;
-        public long SimulationTime = 0;
+        public string SimulationName;
+        public long SimulationTime;
 #endif
         
         public void SendToOutput(MidiEventData data)
         {
-            OutputDevices[0].SendEvent(data.Event);
+            if (!_outputsData.TryGetValue(data.GlobalId, out ChannelIdLink encoding)) return;
+            switch (data.Event.EventType)
+            {
+                case MidiEventType.NoteOn:
+                case MidiEventType.NoteOff:
+                {
+                    NoteEvent noteEvent = (NoteEvent)data.Event;
+                    if(encoding.UsesChannel)noteEvent.Channel = new FourBitNumber((byte)encoding.ChannelId);
+                    _outputDevices[encoding.DeviceId].SendEvent(noteEvent);
+                    break;
+                }
+                case MidiEventType.ProgramChange:
+                {
+                    ProgramChangeEvent programChangeEvent = (ProgramChangeEvent)data.Event;
+                    if(encoding.UsesChannel)programChangeEvent.Channel = new FourBitNumber((byte)encoding.ChannelId);
+                    _outputDevices[encoding.DeviceId].SendEvent(programChangeEvent);
+                    break;
+                }
+                case MidiEventType.NormalSysEx:
+                {
+                    _outputDevices[encoding.DeviceId].SendEvent(data.Event);
+                    break;
+                }
+            }
         }
         
-        public void SetTrackForSimulatedInput(MidiFile track, string name)
+        public void SetTrackForSimulatedInput(MidiFile track,XDocument config, string name)
         {
             _globalTime = 0;
             _globalRealTime = 0;
@@ -52,19 +78,78 @@ namespace AOR.Model
                 .SelectMany((c, i) => c.GetTimedEvents().Select(e => new TimedEventWithTrackChunk(e.Event, e.Time, i)))
                 .OrderBy(e => e.Time);
             var tempoMap = track.GetTempoMap();
-            SimulatedInput = new Playback(timedEvents, tempoMap, SimulationSoundOutput);
+            SimulatedInput = new Playback(timedEvents, tempoMap, _simulationSoundOutput);
             SimulationName = name;
             _simulationDivision = ((TicksPerQuarterNoteTimeDivision)track.TimeDivision).TicksPerQuarterNote;
             SimulatedInput.Speed = Speed;
             SimulatedInput.EventPlayed += OnEventPlayed;
+            _simulationOffsets.Clear();
+            SetupSimulationOffsets(config);
+        }
+
+        private void SetupSimulationOffsets(XDocument config)
+        {
+            var tracks = config.Root?.Element("tracks")?.Elements("track");
+            if (tracks is null) throw new ArgumentException("No 'tracks' tag in simulation config file!");
+            foreach (XElement track in tracks)
+            {
+                XElement trackIdElement = track.Element("trackID");
+                if (trackIdElement is null || !int.TryParse(trackIdElement.Value,out int trackId))throw new ArgumentException("At least one of the simulation tracks does not have 'trackID' tag");
+                XElement usesChannelsElement = track.Element("usesMultiChannel");
+                if (usesChannelsElement is null) throw new ArgumentException("At least one of the simulation tracks does not have 'usesMultiChannel' tag");
+                bool usesChannels = usesChannelsElement.Value == "True";
+                PieceBuffer.TrackData trackData = null;
+                if (usesChannels)
+                {
+                    trackData = new PieceBuffer.TrackData();
+                    var channels = track.Element("channels")?.Elements("channel");
+                    if (channels is null) throw new ArgumentException("At least one of the simulation tracks does not have 'channels' tag even thought track is marked as multichannel one");
+                    foreach (XElement channel in channels)
+                    {
+                        PieceBuffer.ChannelData channelData = null;
+                        XElement channelIdElement = channel.Element("channelID");
+                        if (channelIdElement is null || !int.TryParse(channelIdElement.Value,out int channelId))
+                            throw new ArgumentException("At least one of the channels in simulation track no."+ trackId +" does not have proper 'channelID' tag");
+                        XElement usageElement = channel.Element("use");
+                        if (usageElement is null || !Enum.TryParse(usageElement.Value,out PieceBuffer.Usage channelUsage)) throw new ArgumentException("At least one of the channels in simulation track no." + trackId +" does not have 'use' tag even thought track is marked as multichannel one");
+                        if (channelUsage == PieceBuffer.Usage.Melody)
+                        {
+                            XElement dataElement = channel.Element("offset");
+                            if (dataElement is null || !int.TryParse(dataElement.Value,out int dt)) throw new ArgumentException("At least one of channels in simulation track no." + trackId +" does not have 'offset' tag");
+                            channelData = new PieceBuffer.ChannelData(channelUsage, dt);
+                            trackData.Channels.Add(channelId,channelData);
+                            _simulationOffsets.Add(trackId,trackData);
+                        }
+                    }
+                }
+                else
+                {
+                    XElement usageElement = track.Element("use");
+                    if (usageElement is null || !Enum.TryParse(usageElement.Value,out PieceBuffer.Usage trackUsage)) throw new ArgumentException("Simulation track no." + trackId +" does not have 'use' tag even thought track is not marked as multichannel one");
+                    if (trackUsage == PieceBuffer.Usage.Melody)
+                    {
+                        XElement dataElement = track.Element("offset");
+                        if (dataElement is null || !int.TryParse(dataElement.Value,out int dt)) throw new ArgumentException("At least one of simulation tracks does not have 'offset' tag");
+                        trackData = new PieceBuffer.TrackData(trackUsage, dt);
+                        _simulationOffsets.Add(trackId,trackData);
+                    } 
+                }
+            }
         }
         
-        private long _globalTime = 0;
-        private long _globalRealTime = 0;
+        private long _globalTime;
+        private long _globalRealTime;
         private void OnEventPlayed(object sender, MidiEventPlayedEventArgs args)
         {
             Playback playback = (Playback)sender;
             MidiEventType type = args.Event.EventType;
+            int trackId = (int)args.Metadata;
+            if(!_simulationOffsets.TryGetValue(trackId,out PieceBuffer.TrackData trackData)) return;
+            int offset = 0;
+            if (!trackData.UsesChannels)
+            {
+                offset = trackData.Data;
+            }
             switch (type)
             {
                 case MidiEventType.NoteOn:
@@ -74,7 +159,11 @@ namespace AOR.Model
                     double dividerOn = (tempoOn / (_simulationDivision * 1.0d)) / InputBuffer.TickResolution * 1.0d;
                     long timeOn = (long)Math.Round(noteOnEvent.DeltaTime * dividerOn);
                     _globalRealTime += timeOn;
-                    Bindings.GetInstance().InputBuffer.BufferSimulatedInput(true,noteOnEvent.NoteNumber);
+                    if (trackData.UsesChannels && trackData.Channels.TryGetValue(noteOnEvent.Channel,out PieceBuffer.ChannelData channelData))
+                    {
+                        offset = channelData.Data;
+                    }
+                    Bindings.GetInstance().InputBuffer.BufferSimulatedInput(true,(short)(noteOnEvent.NoteNumber + 128 * offset));
                     break;
                 case MidiEventType.NoteOff:
                     NoteOffEvent noteOffEvent = (NoteOffEvent)args.Event;
@@ -90,7 +179,11 @@ namespace AOR.Model
 #if TEST
                     SimulationTime = _globalRealTime;
 #endif
-                    Bindings.GetInstance().InputBuffer.BufferSimulatedInput(false,noteOffEvent.NoteNumber);
+                    if (trackData.UsesChannels && trackData.Channels.TryGetValue(noteOffEvent.Channel,out PieceBuffer.ChannelData channelData2))
+                    {
+                        offset = channelData2.Data;
+                    }
+                    Bindings.GetInstance().InputBuffer.BufferSimulatedInput(false,(short)(noteOffEvent.NoteNumber + 128 * offset));
                     break;
             }
         }
@@ -98,7 +191,7 @@ namespace AOR.Model
         private void OnEventReceived(object sender, MidiEventReceivedEventArgs e)
         {
             var midiDevice = (MidiDevice)sender;
-            bool result = InputsOffsets.TryGetValue(midiDevice.Name, out InputDeviceData data);
+            bool result = _inputsOffsets.TryGetValue(midiDevice.Name, out InputDeviceData data);
             if (result)
             {
                 bool isNoteOn;
@@ -129,13 +222,7 @@ namespace AOR.Model
                 }
             }
         }
-
-        private void OnEventSent(object sender, MidiEventSentEventArgs e)
-        {
-            var midiDevice = (MidiDevice)sender;
-            //Console.WriteLine("Event sent to " + midiDevice.Name + " at " + DateTime.Now + ": " + e.Event);
-        }
-
+        
         public static List<string> GetAllInputDeviceNames()
         {
             List<string> output = new List<string>();
@@ -174,10 +261,10 @@ namespace AOR.Model
             bool inputMultiChannel = root.Element("inputUsesMultiChannel")?.Value == "Yes";
             bool outputMultiChannel = root.Element("outputUsesMultiChannel")?.Value == "Yes";
             
-            InputDevices.Clear();
-            OutputDevices.Clear();
-            InputsOffsets.Clear();
-            OutputsData.Clear();
+            _inputDevices.Clear();
+            _outputDevices.Clear();
+            _inputsOffsets.Clear();
+            _outputsData.Clear();
             
             XElement inputs = root.Element("inputs");
             if(inputs is null || !inputs.HasElements) return;
@@ -194,7 +281,7 @@ namespace AOR.Model
                         Bindings.GetInstance().FromFile = true;
                         XElement soundOutputElement = inputDevice.Element("soundOutput");
                         if(soundOutputElement is null || !outputNames.Contains(soundOutputElement.Value)) return;
-                        SimulationSoundOutput = OutputDevice.GetByName(soundOutputElement.Value);
+                        _simulationSoundOutput = OutputDevice.GetByName(soundOutputElement.Value);
                         break;
                     }
                     Bindings.GetInstance().FromFile = false;
@@ -202,14 +289,14 @@ namespace AOR.Model
                     {
                         InputDevice inputDev = InputDevice.GetByName(inputName);
                         inputDev.EventReceived += OnEventReceived;
-                        InputDevices.Add(inputDev);
+                        _inputDevices.Add(inputDev);
                         if (inputMultiChannel)
                         {
                             XElement channelsElement = inputDevice.Element("channels");
                             if(channelsElement == null) return;
                             var channels = channelsElement.Elements("channel");
                             InputDeviceData newInputDevice = new InputDeviceData(inputName, 0, true);
-                            InputsOffsets.Add(inputName,newInputDevice);
+                            _inputsOffsets.Add(inputName,newInputDevice);
                             foreach (XElement channel in channels)
                             {
                                 XElement idElement = channel.Element("id");
@@ -226,7 +313,7 @@ namespace AOR.Model
                             XElement offsetElement = inputDevice.Element("offset");
                             if(offsetElement is null) return;
                             int offset = int.Parse(offsetElement.Value); 
-                            InputsOffsets.Add(inputName,new InputDeviceData(inputName,offset,false));
+                            _inputsOffsets.Add(inputName,new InputDeviceData(inputName,offset,false));
                         }
                     }
                     else
@@ -243,7 +330,7 @@ namespace AOR.Model
             if(xElements.Count == 0) return;
             for (int i = 0; i < xElements.Count; i++)
             {
-                OutputDevices.Add(null);
+                _outputDevices.Add(null);
             }
             
             foreach (XElement outputDevice in xElements)
@@ -253,12 +340,11 @@ namespace AOR.Model
                 if (outputName != null && outputNames.Contains(outputName))
                 {
                     OutputDevice outputDev = OutputDevice.GetByName(outputName);
-                    outputDev.EventSent += OnEventSent;
                     
                     XElement deviceIdElement = outputDevice.Element("deviceID");
                     if(deviceIdElement is null) return;
                     int id = int.Parse(deviceIdElement.Value);
-                    OutputDevices[id] = outputDev;
+                    _outputDevices[id] = outputDev;
                     if (outputMultiChannel)
                     {
                         XElement channelsElement = outputDevice.Element("channels");
@@ -268,19 +354,19 @@ namespace AOR.Model
                         {
                             XElement globalIdElement = channel.Element("globalID");
                             if(globalIdElement is null) return;
-                            int ID = int.Parse(globalIdElement.Value);
+                            int globalId = int.Parse(globalIdElement.Value);
                             XElement channelIdElement = channel.Element("channelID");
                             if(channelIdElement is null) return;
                             int channelId = int.Parse(channelIdElement.Value);
-                            OutputsData.Add(ID,new ChannelIDLink(true,id,channelId));
+                            _outputsData.Add(globalId,new ChannelIdLink(true,id,channelId));
                         }
                     }
                     else
                     {
                         XElement globalIdElement = outputDevice.Element("globalID");
                         if(globalIdElement is null) return;
-                        int ID = int.Parse(globalIdElement.Value);
-                        OutputsData.Add(ID,new ChannelIDLink(false,id,-1));
+                        int globalId = int.Parse(globalIdElement.Value);
+                        _outputsData.Add(globalId,new ChannelIdLink(false,id,-1));
                     }
                 }
             }

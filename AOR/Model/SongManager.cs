@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Windows.Data.Pdf;
 using Melanchall.DryWetMidi.Core;
 
@@ -24,6 +25,7 @@ namespace AOR.Model
                 ZipArchive archive = new ZipArchive(zipFile, ZipArchiveMode.Read);
                 MidiFile file = null;
                 PdfDocument document = null;
+                XDocument config = null;
                 foreach (ZipArchiveEntry entry in archive.Entries)
                 {
                     if (entry.Name.Contains(".pdf"))
@@ -36,9 +38,13 @@ namespace AOR.Model
                     {
                         file = MidiFile.Read(entry.Open());
                     }
+                    else if (entry.Name.Contains(".xml"))
+                    {
+                        config = XDocument.Load(entry.Open());
+                    }
                 }
                 if (file is null || document is null) return;
-                PieceData newPiece = new PieceData(file,document, path);
+                PieceData newPiece = new PieceData(file,document,config,path);
                 if (!Pieces.Contains(newPiece))
                 {
                     Pieces.Add(newPiece);
@@ -50,13 +56,15 @@ namespace AOR.Model
         {
             public MidiFile MidiFile;
             public PdfDocument PdfDocument;
+            public XDocument Config;
             public string Path;
             public string SongName;
 
-            public PieceData(MidiFile file,PdfDocument document , string path)
+            public PieceData(MidiFile file, PdfDocument document,XDocument config, string path)
             {
                 MidiFile = file;
                 PdfDocument = document;
+                Config = config;
                 Path = path;
                 SongName = System.IO.Path.GetFileNameWithoutExtension(Path);
             }

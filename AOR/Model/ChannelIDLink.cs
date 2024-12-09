@@ -1,13 +1,12 @@
-﻿
-namespace AOR.Model
+﻿namespace AOR.Model
 {
-    public class ChannelIDLink
+    public class ChannelIdLink
     {
-        public bool UsesChannel = false;
-        public int DeviceId;
-        public int ChannelId;
+        public readonly bool UsesChannel;
+        public readonly int DeviceId;
+        public readonly int ChannelId;
 
-        public ChannelIDLink(bool usesChannel, int deviceId, int channelId)
+        public ChannelIdLink(bool usesChannel, int deviceId, int channelId)
         {
             UsesChannel = usesChannel;
             DeviceId = deviceId;

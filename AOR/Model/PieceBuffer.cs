@@ -6,6 +6,7 @@ using System.Windows.Media.Imaging;
 using Melanchall.DryWetMidi.Core;
 using Melanchall.DryWetMidi.Interaction;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Windows.Data.Pdf;
 using Windows.Storage.Streams;
 using AOR.ModelView;
@@ -18,13 +19,13 @@ namespace AOR.Model
         private readonly Dictionary<short, NoteLine> _notesInProgress = new Dictionary<short, NoteLine>();
         
         private readonly List<MidiEventData> _registrantsChangesBuffer = new List<MidiEventData>();
-        private List<PageData> _pageChangesBuffer = new List<PageData>();
+        private readonly List<PageData> _pageChangesBuffer = new List<PageData>();
         
-        private List<BitmapImage> _sheetPages = null;
+        private List<BitmapImage> _sheetPages;
         
         
-        private uint _previousTimeValue = 0;
-        private uint _currentTimeValue = 0;
+        private uint _previousTimeValue;
+        private uint _currentTimeValue;
         public uint CurrentTimeValue
         {
             get => _currentTimeValue;
@@ -89,10 +90,13 @@ namespace AOR.Model
             }
         }
         
-        public PieceBuffer(MidiFile file)
+        public PieceBuffer(MidiFile file, XDocument config)
         {
             if (file.OriginalFormat != MidiFileFormat.MultiTrack)
                 throw new InvalidDataException("Selected MIDI file has to be of type 1 (multi-track)");
+            
+            var configData = ParseConfig(config);
+            
             //Get chunks
             var chunks = file.Chunks;
             //Get file time division setting
@@ -110,6 +114,7 @@ namespace AOR.Model
                 if (chunk.ChunkId == "MTrk")
                 {
                     Console.WriteLine(@"Chunk no. " + index);
+                    if (!configData.TryGetValue(index, out TrackData trackData)) continue;
                     TrackChunk trackChunk = (TrackChunk)chunk;
                     long globalMidiTrackTime = 0;
                     uint globalTrackTime = 0;
@@ -121,42 +126,145 @@ namespace AOR.Model
                         double divider = (tempo / (division * 1.0d)) / InputBuffer.TickResolution * 1.0d;
                         uint localTrackTime = (uint)Math.Round(midiEvent.DeltaTime * divider);
                         globalTrackTime += localTrackTime;
-                        switch (index)
+                        switch (midiEvent.EventType)
                         {
-                            //Melody
-                            case 0:
+                            case MidiEventType.NoteOn:
                             {
-                                if (midiEvent.EventType == MidiEventType.NoteOn || midiEvent.EventType == MidiEventType.NoteOff)
+                                NoteOnEvent castEvent = (NoteOnEvent)midiEvent;
+                                if (trackData.UsesChannels && trackData.Channels.TryGetValue(castEvent.Channel,out ChannelData channelData))
                                 {
-                                    NoteEvent noteEvent = (NoteEvent)midiEvent;
-                                    AddToMelodyBuffer(noteEvent.NoteNumber,globalTrackTime);
+                                    switch (channelData.Use)
+                                    {
+                                        case Usage.Melody:
+                                        {
+                                            AddToMelodyBuffer((short)(castEvent.NoteNumber + 128 * channelData.Data),globalTrackTime);
+                                            break;
+                                        }
+                                        case Usage.Registers:
+                                        {
+                                            if (channelData.RegisterFormat == RegisterFormat.Note)
+                                            {
+                                                _registrantsChangesBuffer.Add(new MidiEventData(midiEvent,globalTrackTime,channelData.Data));
+                                            }
+                                            break;
+                                        }
+                                        case Usage.Pages:
+                                        {
+                                            _pageChangesBuffer.Add(new PageData(castEvent.NoteNumber,globalTrackTime,0));
+                                            break;
+                                        }
+                                    }
+                                }
+                                else if(!trackData.UsesChannels)
+                                {
+                                    switch (trackData.Use)
+                                    {
+                                        case Usage.Melody:
+                                        {
+                                            AddToMelodyBuffer((short)(castEvent.NoteNumber + 128 * trackData.Data),globalTrackTime);
+                                            break;
+                                        }
+                                        case Usage.Registers:
+                                        {
+                                            if (trackData.RegisterFormat == RegisterFormat.Note)
+                                            {
+                                                _registrantsChangesBuffer.Add(new MidiEventData(midiEvent,globalTrackTime,trackData.Data));
+                                            }
+                                            break;
+                                        }
+                                        case Usage.Pages:
+                                        {
+                                            _pageChangesBuffer.Add(new PageData(castEvent.NoteNumber,globalTrackTime,0));
+                                            break;
+                                        }
+                                    }
                                 }
                                 break;
                             }
-                            //Register changes
-                            case 1:
+                            case MidiEventType.NoteOff:
                             {
-                                if (midiEvent.EventType == MidiEventType.NoteOn ||
-                                    midiEvent.EventType == MidiEventType.NoteOff ||
-                                    midiEvent.EventType == MidiEventType.ProgramChange ||
-                                    midiEvent.EventType == MidiEventType.NormalSysEx)
+                                NoteOffEvent castEvent = (NoteOffEvent)midiEvent;
+                                if (trackData.UsesChannels && trackData.Channels.TryGetValue(castEvent.Channel,out ChannelData channelData))
                                 {
-                                    _registrantsChangesBuffer.Add(new MidiEventData(midiEvent,globalTrackTime));
+                                    switch (channelData.Use)
+                                    {
+                                        case Usage.Melody:
+                                        {
+                                            AddToMelodyBuffer((short)(castEvent.NoteNumber + 128 * channelData.Data),globalTrackTime);
+                                            break;
+                                        }
+                                        case Usage.Registers:
+                                        {
+                                            if (channelData.RegisterFormat == RegisterFormat.Note)
+                                            {
+                                                _registrantsChangesBuffer.Add(new MidiEventData(midiEvent,globalTrackTime,channelData.Data));
+                                            }
+                                            break;
+                                        }
+                                        case Usage.Pages:
+                                        {
+                                            _pageChangesBuffer.Last().EndTimeStamp = globalTrackTime;
+                                            break;
+                                        }
+                                    }
+                                }
+                                else if(!trackData.UsesChannels)
+                                {
+                                    switch (trackData.Use)
+                                    {
+                                        case Usage.Melody:
+                                        {
+                                            AddToMelodyBuffer((short)(castEvent.NoteNumber + 128 * trackData.Data),globalTrackTime);
+                                            break;
+                                        }
+                                        case Usage.Registers:
+                                        {
+                                            if (trackData.RegisterFormat == RegisterFormat.Note)
+                                            {
+                                                _registrantsChangesBuffer.Add(new MidiEventData(midiEvent,globalTrackTime,trackData.Data));
+                                            }
+                                            break;
+                                        }
+                                        case Usage.Pages:
+                                        {
+                                            _pageChangesBuffer.Last().EndTimeStamp = globalTrackTime;
+                                            break;
+                                        }
+                                    }
                                 }
                                 break;
                             }
-                            //Page changes
-                            case 2:
+                            case MidiEventType.ProgramChange:
                             {
-                                if (midiEvent.EventType == MidiEventType.NoteOn)
+                                ProgramChangeEvent castEvent = (ProgramChangeEvent)midiEvent;
+                                if (trackData.UsesChannels && trackData.Channels.TryGetValue(castEvent.Channel,out ChannelData channelData))
                                 {
-                                    NoteOnEvent onEvent = (NoteOnEvent)midiEvent;
-                                    _pageChangesBuffer.Add(new PageData(onEvent.NoteNumber,globalTrackTime,0));
-                                } 
-                                else if (midiEvent.EventType == MidiEventType.NoteOff)
+                                    if (channelData.Use == Usage.Registers)
+                                    {
+                                        if (channelData.RegisterFormat == RegisterFormat.ProgramChange)
+                                        {
+                                            _registrantsChangesBuffer.Add(new MidiEventData(midiEvent,globalTrackTime,channelData.Data));
+                                        }
+                                    }
+                                }
+                                else if(!trackData.UsesChannels)
                                 {
-                                    NoteOffEvent offEvent = (NoteOffEvent)midiEvent;
-                                    _pageChangesBuffer.Last().EndTimeStamp = globalTrackTime;
+                                    if (trackData.Use == Usage.Registers)
+                                    {
+                                        if (trackData.RegisterFormat == RegisterFormat.ProgramChange)
+                                        {
+                                            _registrantsChangesBuffer.Add(new MidiEventData(midiEvent,globalTrackTime,trackData.Data));
+                                        }
+                                    }
+                                }
+                                break;
+                            }
+                            case MidiEventType.NormalSysEx:
+                            {
+                                //NormalSysExEvent castEvent = (NormalSysExEvent)midiEvent;
+                                if(!trackData.UsesChannels && trackData.Use == Usage.Registers && trackData.RegisterFormat == RegisterFormat.SysEx)
+                                { 
+                                    _registrantsChangesBuffer.Add(new MidiEventData(midiEvent,globalTrackTime,trackData.Data));
                                 }
                                 break;
                             }
@@ -164,7 +272,6 @@ namespace AOR.Model
                     }
                     index++;
                 }
-                if(index >= 3) break;
             }
 
             if (_pageChangesBuffer.Count > 0)
@@ -176,6 +283,142 @@ namespace AOR.Model
                 }
             }
             _notesInProgress.Clear();
+        }
+
+        public enum Usage
+        {
+            None,
+            Melody,
+            Registers,
+            Pages
+        }
+
+        public enum RegisterFormat
+        {
+            NotApply,
+            Note,
+            ProgramChange,
+            SysEx
+        }
+        
+        public class TrackData
+        {
+            public readonly Usage Use;
+            public RegisterFormat RegisterFormat = RegisterFormat.NotApply;
+            public readonly bool UsesChannels;
+            public readonly int Data;
+            public readonly Dictionary<int, ChannelData> Channels = new Dictionary<int, ChannelData>();
+
+
+            public TrackData(Usage use, int data)
+            {
+                Use = use;
+                UsesChannels = false;
+                Data = data;
+            }
+            
+            public TrackData()
+            {
+                Use = Usage.None;
+                UsesChannels = true;
+            }
+            
+        }
+
+        public class ChannelData
+        {
+            public readonly Usage Use;
+            public RegisterFormat RegisterFormat = RegisterFormat.NotApply;
+            public readonly int Data;
+
+            public ChannelData(Usage use, int data)
+            {
+                Use = use;
+                Data = data;
+            }
+        }
+
+        private Dictionary<int, TrackData> ParseConfig(XDocument config)
+        {
+            Dictionary<int, TrackData> output = new Dictionary<int, TrackData>();
+            var tracks = config.Root?.Element("tracks")?.Elements("track");
+            if (tracks is null) throw new ArgumentException("No 'tracks' tag in melody config file!");
+            foreach (XElement track in tracks)
+            {
+                XElement trackIdElement = track.Element("trackID");
+                if (trackIdElement is null)
+                    throw new ArgumentException("At least one of the tracks does not have 'trackID' tag");
+                int trackId = int.Parse(trackIdElement.Value);
+                XElement usesChannelsElement = track.Element("usesMultiChannel");
+                if (usesChannelsElement is null) throw new ArgumentException("At least one of the tracks does not have 'usesMultiChannel' tag");
+                bool usesChannels = usesChannelsElement.Value == "True";
+                TrackData trackData = null;
+                if (usesChannels)
+                {
+                    trackData = new TrackData();
+                    var channels = track.Element("channels")?.Elements("channel");
+                    if (channels is null) throw new ArgumentException("At least one of the tracks does not have 'channels' tag even thought track is marked as multichannel one");
+                    foreach (XElement channel in channels)
+                    {
+                        ChannelData channelData = null;
+                        XElement channelIdElement = channel.Element("channelID");
+                        if (channelIdElement is null || !int.TryParse(channelIdElement.Value,out int channelId))
+                            throw new ArgumentException("At least one of the channels in track no." + trackId +
+                                                        " does not have proper 'channelID' tag");
+                        XElement usageElement = channel.Element("use");
+                        if (usageElement is null || !Enum.TryParse(usageElement.Value,out Usage channelUsage)) throw new ArgumentException("At least one of the channels in track no." + trackId +" does not have 'use' tag even thought track is marked as multichannel one");
+                        if (channelUsage == Usage.Melody)
+                        {
+                            XElement dataElement = channel.Element("offset");
+                            if (dataElement is null || !int.TryParse(dataElement.Value,out int dt)) throw new ArgumentException("At least one of channels in track no." + trackId +" does not have 'offset' tag");
+                            channelData = new ChannelData(channelUsage, dt);
+                        }
+                        else if (channelUsage == Usage.Registers)
+                        {
+                            XElement dataElement = channel.Element("globalID");
+                            if (dataElement is null || !int.TryParse(dataElement.Value,out int dt)) throw new ArgumentException("At least one of channels in track no." + trackId +" does not have 'globalID' tag");
+                            channelData = new ChannelData(channelUsage, dt);
+                            XElement formatElement = channel.Element("registerFormat");
+                            if (formatElement is null || !Enum.TryParse(formatElement.Value, out RegisterFormat registerFormat))
+                                throw new ArgumentException("At least one of register channels in track no." + trackId +" does not have 'registerFormat' tag");
+                            channelData.RegisterFormat = registerFormat;
+                        } 
+                        else if (channelUsage == Usage.Pages)
+                        {
+                            channelData = new ChannelData(channelUsage, -1);
+                        }
+                        trackData.Channels.Add(channelId,channelData);
+                    }
+                }
+                else
+                {
+                    XElement usageElement = track.Element("use");
+                    if (usageElement is null || !Enum.TryParse(usageElement.Value,out Usage trackUsage)) throw new ArgumentException("Track no." + trackId +" does not have 'use' tag even thought track is not marked as multichannel one");
+                    if (trackUsage == Usage.Melody)
+                    {
+                        XElement dataElement = track.Element("offset");
+                        if (dataElement is null || !int.TryParse(dataElement.Value,out int dt)) throw new ArgumentException("At least one of melody tracks does not have 'offset' tag");
+                        trackData = new TrackData(trackUsage, dt);
+                    } 
+                    else if (trackUsage == Usage.Registers)
+                    {
+                        XElement dataElement = track.Element("globalID");
+                        if (dataElement is null || !int.TryParse(dataElement.Value,out int dt)) throw new ArgumentException("At least one of register tracks does not have 'globalID' tag");
+                        trackData = new TrackData(trackUsage, dt);
+                        XElement formatElement = track.Element("registerFormat");
+                        if (formatElement is null || !Enum.TryParse(formatElement.Value, out RegisterFormat registerFormat))
+                            throw new ArgumentException("At least one of register tracks does not have 'registerFormat' tag");
+                        trackData.RegisterFormat = registerFormat;
+                    } 
+                    else if (trackUsage == Usage.Pages)
+                    {
+                        trackData = new TrackData(trackUsage, -1);
+                    }
+                }
+                output.Add(trackId,trackData);
+            }
+
+            return output;
         }
         
         public async Task LoadPdfPages(PdfDocument pdfDocument)

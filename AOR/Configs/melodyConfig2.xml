@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<melodyConfig>
+    <tracks>
+        <track>
+            <trackID>0</trackID>
+            <usesMultiChannel>Yes</usesMultiChannel>
+            <channels>
+                <channel>
+                    <channelID>0</channelID>
+                    <use>Melody</use>
+                    <offset>0</offset>
+                </channel>
+                <channel>
+                    <channelID>1</channelID>
+                    <use>Melody</use>
+                    <offset>1</offset>
+                </channel>
+                <channel>
+                    <channelID>5</channelID>
+                    <use>Melody</use>
+                    <offset>2</offset>
+                </channel>
+            </channels>
+        </track>
+        <track>
+            <trackID>1</trackID>
+            <usesMultiChannel>No</usesMultiChannel>
+            <use>Registers</use>
+            <registerFormat>ProgramChange</registerFormat>
+            <globalID>0</globalID>
+        </track>
+        <track>
+            <trackID>2</trackID>
+            <usesMultiChannel>No</usesMultiChannel>
+            <use>Pages</use>
+        </track>
+    </tracks>
+</melodyConfig>
