@@ -89,7 +89,6 @@ namespace AOR.ModelView
             {
                 _inputDeviceName = value;
                 OnPropertyChanged();
-                DeviceController.SetInputDevice(_inputDeviceName);
             }
         }
         
@@ -102,7 +101,6 @@ namespace AOR.ModelView
             {
                 _outputDeviceName = value;
                 OnPropertyChanged();
-                DeviceController.SetOutputDevice(_outputDeviceName);
             }
         }
         
@@ -138,7 +136,7 @@ namespace AOR.ModelView
         public async void ProcessSelectedPiece()
         {
             if(SelectedPiece is null) return;
-            PieceBuffer = new PieceBuffer(SelectedPiece.MidiFile);
+            PieceBuffer = new PieceBuffer(SelectedPiece.MidiFile, SelectedPiece.Config);
             await PieceBuffer.LoadPdfPages(SelectedPiece.PdfDocument);
         }
     }

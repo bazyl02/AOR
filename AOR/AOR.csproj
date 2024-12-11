@@ -53,6 +53,7 @@
         <Reference Include="System.Xaml">
             <RequiredTargetFramework>4.0</RequiredTargetFramework>
         </Reference>
+        <Reference Include="System.Xml.Linq" />
         <Reference Include="Windows">
           <HintPath>..\..\..\..\..\Program Files (x86)\Windows Kits\10\UnionMetadata\10.0.22621.0\Windows.winmd</HintPath>
         </Reference>
@@ -68,10 +69,12 @@
         <Compile Include="ModelView\Bindings.cs" />
         <Compile Include="Model\Algorithm.cs" />
         <Compile Include="Model\DeviceController.cs" />
+        <Compile Include="Model\InputDeviceData.cs" />
         <Compile Include="Model\Helpers.cs" />
         <Compile Include="Model\InputBuffer.cs" />
         <Compile Include="Model\MidiEventData.cs" />
         <Compile Include="Model\NoteLine.cs" />
+        <Compile Include="Model\ChannelIDLink.cs" />
         <Compile Include="Model\PageData.cs" />
         <Compile Include="Model\PieceBuffer.cs" />
         <Compile Include="Model\SongManager.cs" />
@@ -80,6 +83,9 @@
         </Compile>
         <Compile Include="View\Controls\BottomBar.xaml.cs">
           <DependentUpon>BottomBar.xaml</DependentUpon>
+        </Compile>
+        <Compile Include="View\Controls\ConfigFileDialog.xaml.cs">
+          <DependentUpon>ConfigFileDialog.xaml</DependentUpon>
         </Compile>
         <Compile Include="View\Controls\DeviceBar.xaml.cs">
           <DependentUpon>DeviceBar.xaml</DependentUpon>
@@ -116,6 +122,7 @@
         </Compile>
         <Page Include="SheetWindow.xaml" />
         <Page Include="View\Controls\BottomBar.xaml" />
+        <Page Include="View\Controls\ConfigFileDialog.xaml" />
         <Page Include="View\Controls\DeviceBar.xaml" />
         <Page Include="View\Controls\DropDown.xaml" />
         <Page Include="View\Controls\DropDownOutput.xaml" />
@@ -143,11 +150,15 @@
         <None Include="packages.config" />
     </ItemGroup>
     <ItemGroup>
-      <Content Include="Data\Megalovania.mid" />
-    </ItemGroup>
-    <ItemGroup>
+      <Folder Include="Data\" />
       <Folder Include="SheetMaker\" />
       <Folder Include="Sheets\" />
+    </ItemGroup>
+    <ItemGroup>
+      <Content Include="Configs\melodyConfig.xml" />
+      <Content Include="Configs\melodyConfig2.xml" />
+      <Content Include="Configs\organConfig.xml" />
+      <Content Include="Configs\testConfig.xml" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>
     <Import Project="..\packages\Melanchall.DryWetMidi.7.2.0\build\Melanchall.DryWetMidi.targets" Condition="Exists('..\packages\Melanchall.DryWetMidi.7.2.0\build\Melanchall.DryWetMidi.targets')" />

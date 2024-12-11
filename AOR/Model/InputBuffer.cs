@@ -13,7 +13,7 @@ namespace AOR.Model
         public const int MinimumBufferSize = 10;
         
         public List<NoteLine> UserBuffer = new List<NoteLine>(UserBufferSize);
-        private Dictionary<byte, NoteLine> _notesInProgress = new Dictionary<byte, NoteLine>();
+        private Dictionary<short, NoteLine> _notesInProgress = new Dictionary<short, NoteLine>();
 
         public uint StartTimestamp = 0;
         public uint EndTimestamp = 0;
@@ -39,7 +39,7 @@ namespace AOR.Model
         }
 #endif
         
-        private void BufferInput(byte tone, uint timestamp, bool noteOn)
+        private void BufferInput(short tone, uint timestamp, bool noteOn)
         {
              bool result = _notesInProgress.TryGetValue(tone, out NoteLine line);
              if (result)
@@ -89,7 +89,7 @@ namespace AOR.Model
              }
         }
         
-        public void BufferUserInput(bool on ,byte tone)
+        public void BufferUserInput(bool on ,short tone)
         {
             long ticks = _stopwatch.ElapsedTicks;
             ticks /= Stopwatch.Frequency / TickResolution;
@@ -104,7 +104,7 @@ namespace AOR.Model
             BufferInput(tone, (uint)ticks, on);
         }
         
-        public void BufferSimulatedInput(bool on, byte tone, long deltaTime)
+        public void BufferSimulatedInput(bool on, short tone)
         {
             long ticks = _stopwatch.ElapsedTicks;
             ticks /= Stopwatch.Frequency / TickResolution;

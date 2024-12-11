@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<instrumentConfig>
+    <configName>testConfig</configName>
+    <inputUsesMultiChannel>No</inputUsesMultiChannel>
+    <inputs>
+        <input>
+            <name>From File</name>
+            <offset>0</offset>
+            <soundOutput>Microsoft GS Wavetable Synth</soundOutput>
+        </input>
+    </inputs>
+    <outputUsesMultiChannel>No</outputUsesMultiChannel>
+    <outputs>
+        <!--
+        <output>
+            <name>Microsoft GS Wavetable Synth</name>
+            <deviceID>0</deviceID>
+            <globalID>0</globalID>
+        </output>
+        -->
+    </outputs>
+</instrumentConfig>
