@@ -15,6 +15,8 @@ namespace AOR.Model
         private const int BehindSize = 32;
 
         private const int GraceValue = 10;
+
+        private const float SpeedStep = 0.05f;
         
         private readonly PieceBuffer _pieceBuffer = Bindings.GetInstance().PieceBuffer;
         private readonly InputBuffer _inputBuffer = Bindings.GetInstance().InputBuffer;
@@ -22,7 +24,9 @@ namespace AOR.Model
         private int _previousHighestIndex = -1;
         private readonly float[] _highestRatios = new float[HighestAmount];
         private readonly int[] _highestRatioIndices = new int[HighestAmount];
-
+        
+        private float _previousSpeed = 1.0f;
+        
         public uint Run()
         {
             Stopwatch stopwatch = new Stopwatch();
