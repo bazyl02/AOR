@@ -34,7 +34,7 @@ namespace AOR.Model
         private OutputDevice _simulationSoundOutput ;
         public Playback SimulatedInput;
         private short _simulationDivision = 128;
-        private const double Speed = 1.0;
+        private const double Speed = 1.0f;
         
 #if TEST
         public string SimulationName;
