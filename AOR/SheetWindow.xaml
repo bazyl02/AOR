@@ -5,8 +5,15 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:local="clr-namespace:AOR"
         xmlns:controls="clr-namespace:AOR.View.Controls"
+        xmlns:view="clr-namespace:AOR.View"
         mc:Ignorable="d" 
         Title="SheetWindow" Height="850" Width="1600">
+    <Window.Resources>
+        <view:HalfConverter x:Key="HalfConverter"/>
+        <view:HalfValueConverter1 x:Key="HalfValueConverter1"/>
+        <view:HalfValueConverter2 x:Key="HalfValueConverter2"/>
+    </Window.Resources>
+    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="0.05*"/>
@@ -20,9 +27,33 @@
         </Grid.ColumnDefinitions>
         
         <Canvas Name="Canvas1" Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Grid.ColumnSpan="2" Background="Gray">
-            <Image Name="MainSheet" Source="{Binding CurrentSheet}" Width="{Binding Path=ActualWidth, ElementName=Canvas1}" Height="{Binding Path=ActualHeight, ElementName=Canvas1}" Stretch="Uniform" ></Image>
-            <Image Name="SlidingSheet" Source="{Binding NewSheet}" Width="{Binding Path=ActualWidth, ElementName=Canvas1}" Height="{Binding Path=ActualHeight, ElementName=Canvas1}" Stretch="Uniform"/>
+            <Image Name="MainSheet" Source="{Binding CurrentSheet}" Width="{Binding Path=ActualWidth, ElementName=Canvas1,Converter={StaticResource HalfConverter},ConverterParameter=@VALUE}" Height="{Binding Path=ActualHeight, ElementName=Canvas1}" Stretch="Uniform">
+                <Canvas.Left>
+                    <MultiBinding Converter="{StaticResource HalfValueConverter1}">
+                        <Binding ElementName="Canvas1" Path="ActualWidth"/>
+                        <Binding ElementName="MainSheet" Path="ActualWidth"/>
+                    </MultiBinding>
+                </Canvas.Left>
+            </Image>
+            <Image Name="MainSheet2" Source="{Binding CurrentSheet2}" Width="{Binding Path=ActualWidth, ElementName=Canvas1,Converter={StaticResource HalfConverter},ConverterParameter=@VALUE}" Height="{Binding Path=ActualHeight, ElementName=Canvas1}" Stretch="Uniform">
+                <Canvas.Left>
+                    <MultiBinding Converter="{StaticResource HalfValueConverter2}">
+                        <Binding ElementName="Canvas1" Path="ActualWidth"/>
+                        <Binding ElementName="MainSheet2" Path="ActualWidth"/>
+                    </MultiBinding>
+                </Canvas.Left>
+            </Image>
+            <Image Name="SlidingSheet" Source="{Binding NewSheet}" Width="{Binding Path=ActualWidth, ElementName=Canvas1,Converter={StaticResource HalfConverter},ConverterParameter=@VALUE}" Height="{Binding Path=ActualHeight, ElementName=Canvas1}" Stretch="Uniform">
+                <Canvas.Left>
+                    <MultiBinding Converter="{StaticResource HalfValueConverter2}">
+                        <Binding ElementName="Canvas1" Path="ActualWidth"/>
+                        <Binding ElementName="SlidingSheet" Path="ActualWidth"/>
+                    </MultiBinding>
+                </Canvas.Left>
+            </Image>
         </Canvas>
+        
+        <Button Grid.Row="0" Grid.Column="0" Click="ButtonBase_OnClick"></Button>
         
         <controls:PlaybackControls Grid.Column="1" Grid.Row="0"></controls:PlaybackControls>
     </Grid>

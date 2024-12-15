@@ -108,6 +108,7 @@
         <Compile Include="View\Controls\SongList.xaml.cs">
           <DependentUpon>SongList.xaml</DependentUpon>
         </Compile>
+        <Compile Include="View\HalfConverter.cs" />
         <Page Include="MainWindow.xaml">
             <Generator>MSBuild:Compile</Generator>
             <SubType>Designer</SubType>

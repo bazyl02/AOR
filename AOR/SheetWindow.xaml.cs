@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Media.Animation;
 using AOR.ModelView;
 using Melanchall.DryWetMidi.Multimedia;
 using TranslateTransform = System.Windows.Media.TranslateTransform;
@@ -23,11 +25,13 @@ namespace AOR
                 await Task.Delay(25);
             }
             ResetSecondary();
+            ResetPrimary();
         }
         
         private void OnSizeChanged(object sender, System.Windows.SizeChangedEventArgs e)
         {
             ResetSecondary();
+            ResetPrimary();
         }
 
         protected override async void OnStateChanged(EventArgs e)
@@ -39,11 +43,15 @@ namespace AOR
         {
             TranslateTransform transform = new TranslateTransform(0,0);
             MainSheet.RenderTransform = transform;
+            TranslateTransform transform2 = new TranslateTransform(0,0);
+            MainSheet2.RenderTransform = transform2;
+            
+            //-(MainSheet2.ActualWidth == 0 ? ActualWidth : MainSheet2.ActualWidth)
         }
         
         private void ResetSecondary()
         {
-            TranslateTransform transform = new TranslateTransform(ActualWidth * 0.5f + (SlidingSheet.ActualWidth == 0 ? ActualWidth : SlidingSheet.ActualWidth) * 0.5f,0);
+            TranslateTransform transform = new TranslateTransform(ActualWidth * 0.5f,0);
             SlidingSheet.RenderTransform = transform;
         }
 
@@ -72,6 +80,30 @@ namespace AOR
             });
         }
         
+        public void AnimateSheets(double time)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                DoubleAnimation animMain =
+                    new DoubleAnimation(-MainSheet.ActualWidth, TimeSpan.FromMilliseconds(time));
+                DoubleAnimation animMain2 =
+                    new DoubleAnimation(-MainSheet2.ActualWidth, TimeSpan.FromMilliseconds(time));
+                DoubleAnimation animSliding =
+                    new DoubleAnimation(ActualWidth * 0.5f,0, TimeSpan.FromMilliseconds(time));
+                TranslateTransform main = new TranslateTransform();
+                TranslateTransform main2 = new TranslateTransform();
+                TranslateTransform sliding = new TranslateTransform();
+
+                MainSheet.RenderTransform = main;
+                MainSheet2.RenderTransform = main2;
+                SlidingSheet.RenderTransform = sliding;
+                
+                main.BeginAnimation(TranslateTransform.XProperty,animMain);
+                main2.BeginAnimation(TranslateTransform.XProperty,animMain2);
+                sliding.BeginAnimation(TranslateTransform.XProperty,animSliding);
+            });
+        }
+        
         protected override void OnClosed(EventArgs e)
         {
             Bindings.GetInstance().SheetWindow = null;
@@ -81,6 +113,11 @@ namespace AOR
                 playback.Stop();
                 playback.MoveToStart();
             }
+        }
+
+        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
+        {
+            ResetPrimary();
         }
     }
 }

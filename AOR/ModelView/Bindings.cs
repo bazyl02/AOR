@@ -115,6 +115,17 @@ namespace AOR.ModelView
             }
         }
         
+        private BitmapSource _currentSheet2;
+        public BitmapSource CurrentSheet2
+        {
+            get => _currentSheet2;
+            set
+            {
+                _currentSheet2 = value;
+                OnPropertyChanged();
+            }
+        }
+        
         private BitmapSource _newSheet;
         public BitmapSource NewSheet
         {
