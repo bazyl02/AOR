@@ -6,6 +6,7 @@ using System.Windows.Media.Imaging;
 using Melanchall.DryWetMidi.Core;
 using Melanchall.DryWetMidi.Interaction;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Xml.Linq;
 using Windows.Data.Pdf;
 using Windows.Storage.Streams;
@@ -65,6 +66,7 @@ namespace AOR.Model
                     //float value = 1.0f - (_currentTimeValue - page.StartTimeStamp *1.0f) / (page.EndTimeStamp - page.StartTimeStamp);
                     //Bindings.GetInstance().SheetWindow.MoveSheets(value);
                     Bindings.GetInstance().SheetWindow.AnimateSheets(page.EndTimeStamp - page.StartTimeStamp);
+                    Bindings.GetInstance().SheetWindow.ChangeResizing(false);
                 } 
                 else if (page.EndTimeStamp <= _currentTimeValue && page.EndTimeStamp >= _previousTimeValue && page.Fired)
                 {
@@ -73,6 +75,7 @@ namespace AOR.Model
                     Bindings.GetInstance().CurrentSheet = _pageChangesBuffer.Count > index ? _sheetPages[_pageChangesBuffer[index].PageNumber] : null;
                     Bindings.GetInstance().NewSheet = _pageChangesBuffer.Count > index + 2 ? _sheetPages[_pageChangesBuffer[index + 2].PageNumber] : null;
                     Bindings.GetInstance().SheetWindow.ResetAll();
+                    Bindings.GetInstance().SheetWindow.ChangeResizing(true);
                 }
                 index++;
             }

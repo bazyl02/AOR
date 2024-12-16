@@ -53,8 +53,6 @@
             </Image>
         </Canvas>
         
-        <Button Grid.Row="0" Grid.Column="0" Click="ButtonBase_OnClick"></Button>
-        
-        <controls:PlaybackControls Grid.Column="1" Grid.Row="0"></controls:PlaybackControls>
+        <controls:PlaybackControls Visibility="{Binding FromFileVisible}" Grid.Column="1" Grid.Row="0"></controls:PlaybackControls>
     </Grid>
 </Window>

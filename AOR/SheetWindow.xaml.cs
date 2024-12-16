@@ -103,6 +103,14 @@ namespace AOR
                 sliding.BeginAnimation(TranslateTransform.XProperty,animSliding);
             });
         }
+
+        public void ChangeResizing(bool enable)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                ResizeMode = enable ? ResizeMode.CanResize : ResizeMode.NoResize;
+            });
+        }
         
         protected override void OnClosed(EventArgs e)
         {
@@ -113,11 +121,6 @@ namespace AOR
                 playback.Stop();
                 playback.MoveToStart();
             }
-        }
-
-        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
-        {
-            ResetPrimary();
         }
     }
 }
