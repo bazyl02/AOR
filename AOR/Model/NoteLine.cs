@@ -2,15 +2,20 @@
 {
     public class NoteLine
     {
-        public short Tone;
-        public uint StartTime;
+        public readonly short Tone;
+        public readonly uint StartTime;
         public uint EndTime;
+
+        public readonly float StartTimeFloat;
+        public float EndTimeFloat;
 
         public NoteLine(short tone, uint start, uint end)
         {
             Tone = tone;
             StartTime = start;
             EndTime = end;
+            StartTimeFloat = start;
+            EndTimeFloat = end;
         }
 
         public override string ToString()

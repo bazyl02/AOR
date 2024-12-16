@@ -45,6 +45,7 @@ namespace AOR.Model
              if (result)
              {
                  line.EndTime = timestamp;
+                 line.EndTimeFloat = timestamp;
                  _notesInProgress.Remove(tone);
                  EndTimestamp = timestamp;
 #if DUMP
