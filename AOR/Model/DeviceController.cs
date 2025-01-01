@@ -35,7 +35,9 @@ namespace AOR.Model
         public Playback SimulatedInput;
         private short _simulationDivision = 128;
         private const double Speed = 1.0f;
-        
+
+        public int InputCount => _inputDevices.Count;
+
 #if TEST
         public string SimulationName;
         public long SimulationTime;
@@ -244,6 +246,7 @@ namespace AOR.Model
             return output;
         }
 
+        public bool ConfigLoaded = false;
         public void LoadDeviceConfig(string path)
         {
             XDocument document;
@@ -322,7 +325,7 @@ namespace AOR.Model
                     }
                 }
             }
-            
+            ConfigLoaded = true;
             XElement outputs = root.Element("outputs");
             if(outputs is null || !outputs.HasElements) return;
             var outputDevices = outputs.Elements("output");
@@ -332,7 +335,6 @@ namespace AOR.Model
             {
                 _outputDevices.Add(null);
             }
-            
             foreach (XElement outputDevice in xElements)
             {
                 string outputName = outputDevice.Element("name")?.Value;
