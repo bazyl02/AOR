@@ -156,6 +156,8 @@
       <Folder Include="Sheets\" />
     </ItemGroup>
     <ItemGroup>
+      <Content Include="Configs\example2Config.xml" />
+      <Content Include="Configs\exampleConfig.xml" />
       <Content Include="Configs\melodyConfig.xml" />
       <Content Include="Configs\melodyConfig2.xml" />
       <Content Include="Configs\organConfig.xml" />

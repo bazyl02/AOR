@@ -280,7 +280,9 @@ namespace AOR.Model
                     index++;
                 }
             }
-
+            MelodyBuffer.Sort((x,y) => (int)(x.StartTime - y.StartTime));
+            _pageChangesBuffer.Sort((x,y)=> (int)(x.StartTimeStamp - y.StartTimeStamp));
+            _registrantsChangesBuffer.Sort((x,y)=> (int)(x.GlobalTime - y.GlobalTime));
             if (_pageChangesBuffer.Count > 0)
             {
                 int rootPageNum = _pageChangesBuffer[0].PageNumber;

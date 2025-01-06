@@ -298,7 +298,7 @@ namespace AOR.Model
                             XElement channelsElement = inputDevice.Element("channels");
                             if(channelsElement == null) return;
                             var channels = channelsElement.Elements("channel");
-                            InputDeviceData newInputDevice = new InputDeviceData(inputName, 0, true);
+                            InputDeviceData newInputDevice = new InputDeviceData(0, true);
                             _inputsOffsets.Add(inputName,newInputDevice);
                             foreach (XElement channel in channels)
                             {
@@ -316,7 +316,7 @@ namespace AOR.Model
                             XElement offsetElement = inputDevice.Element("offset");
                             if(offsetElement is null) return;
                             int offset = int.Parse(offsetElement.Value); 
-                            _inputsOffsets.Add(inputName,new InputDeviceData(inputName,offset,false));
+                            _inputsOffsets.Add(inputName,new InputDeviceData(offset,false));
                         }
                     }
                     else
