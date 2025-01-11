@@ -46,10 +46,10 @@ namespace AOR.Model
             for (int step = -1; step <= 1; step++)
             {
                 float checkedSpeed = _previousSpeed + SpeedStep * step;
+                float startTime = _inputBuffer.StartTimestamp * checkedSpeed;
+                float endTime = _inputBuffer.EndTimestamp * checkedSpeed; 
                 for (int i = startIndex; i < endIndex; i++)
                 {
-                    float startTime = _inputBuffer.StartTimestamp * checkedSpeed;
-                    float endTime = _inputBuffer.EndTimestamp * checkedSpeed; 
                     uint bufferTime = _pieceBuffer.MelodyBuffer[i].EndTime;
                     if (bufferTime < endTime - startTime) continue;
                     float sum = 0;
@@ -67,8 +67,8 @@ namespace AOR.Model
                             //Save reference for currently considered user input
                             NoteLine user = _inputBuffer.UserBuffer[k];
                             //Translate timestamps from global space to local buffer space
-                            float userLocalStart = endTime - (user.StartTime * checkedSpeed);
-                            float userLocalEnd = user.EndTime == 0 ? 0 : endTime - (user.EndTime * checkedSpeed);
+                            float userLocalStart = endTime - (user.StartTimeFloat * checkedSpeed);
+                            float userLocalEnd = user.EndTime == 0 ? 0 : endTime - (user.EndTimeFloat * checkedSpeed);
                             //Check alignment conditions
                             if (user.Tone != melody.Tone || userLocalEnd > melodyLocalStart ||
                                 userLocalStart < melodyLocalEnd) continue;

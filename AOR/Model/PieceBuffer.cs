@@ -6,6 +6,7 @@ using System.Windows.Media.Imaging;
 using Melanchall.DryWetMidi.Core;
 using Melanchall.DryWetMidi.Interaction;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Xml.Linq;
 using Windows.Data.Pdf;
 using Windows.Storage.Streams;
@@ -59,16 +60,22 @@ namespace AOR.Model
             int index = 0;
             foreach (PageData page in _pageChangesBuffer)
             {
-                if (page.StartTimeStamp <= _currentTimeValue && page.EndTimeStamp >= _currentTimeValue)
+                if (page.StartTimeStamp <= _currentTimeValue && page.EndTimeStamp >= _currentTimeValue && !page.Fired && Bindings.GetInstance().NewSheet != null)
                 {
-                    float value = 1.0f - (_currentTimeValue - page.StartTimeStamp *1.0f) / (page.EndTimeStamp - page.StartTimeStamp);
-                    Bindings.GetInstance().SheetWindow.MoveSheets(value);
+                    page.Fired = true;
+                    //float value = 1.0f - (_currentTimeValue - page.StartTimeStamp *1.0f) / (page.EndTimeStamp - page.StartTimeStamp);
+                    //Bindings.GetInstance().SheetWindow.MoveSheets(value);
+                    Bindings.GetInstance().SheetWindow.AnimateSheets(page.EndTimeStamp - page.StartTimeStamp);
+                    Bindings.GetInstance().SheetWindow.ChangeResizing(false);
                 } 
-                else if (page.EndTimeStamp <= _currentTimeValue && page.EndTimeStamp >= _previousTimeValue)
+                else if (page.EndTimeStamp <= _currentTimeValue && page.EndTimeStamp >= _previousTimeValue && page.Fired)
                 {
-                    Bindings.GetInstance().CurrentSheet = _sheetPages[page.PageNumber];
-                    Bindings.GetInstance().NewSheet = _pageChangesBuffer.Count > index + 1 ? _sheetPages[_pageChangesBuffer[index + 1].PageNumber] : null;
+                    page.Fired = false;
+                    Bindings.GetInstance().CurrentSheet2 = _pageChangesBuffer.Count > index + 1 ? _sheetPages[_pageChangesBuffer[index + 1].PageNumber] : null;
+                    Bindings.GetInstance().CurrentSheet = _pageChangesBuffer.Count > index ? _sheetPages[_pageChangesBuffer[index].PageNumber] : null;
+                    Bindings.GetInstance().NewSheet = _pageChangesBuffer.Count > index + 2 ? _sheetPages[_pageChangesBuffer[index + 2].PageNumber] : null;
                     Bindings.GetInstance().SheetWindow.ResetAll();
+                    Bindings.GetInstance().SheetWindow.ChangeResizing(true);
                 }
                 index++;
             }
@@ -273,7 +280,9 @@ namespace AOR.Model
                     index++;
                 }
             }
-
+            MelodyBuffer.Sort((x,y) => (int)(x.StartTime - y.StartTime));
+            _pageChangesBuffer.Sort((x,y)=> (int)(x.StartTimeStamp - y.StartTimeStamp));
+            _registrantsChangesBuffer.Sort((x,y)=> (int)(x.GlobalTime - y.GlobalTime));
             if (_pageChangesBuffer.Count > 0)
             {
                 int rootPageNum = _pageChangesBuffer[0].PageNumber;
@@ -441,8 +450,9 @@ namespace AOR.Model
                 }
             }
             _sheetPages = output;
-            if(_sheetPages.Count > 0) Bindings.GetInstance().CurrentSheet = _sheetPages[0];
-            if(_sheetPages.Count > 1) Bindings.GetInstance().NewSheet = _sheetPages[1];
+            if(_pageChangesBuffer.Count > 0 && _sheetPages.Count > 0) Bindings.GetInstance().CurrentSheet = _sheetPages[_pageChangesBuffer[0].PageNumber];
+            if(_pageChangesBuffer.Count > 1 &&_sheetPages.Count > 1) Bindings.GetInstance().CurrentSheet2 = _sheetPages[_pageChangesBuffer[1].PageNumber];
+            if(_pageChangesBuffer.Count > 2 &&_sheetPages.Count > 2) Bindings.GetInstance().NewSheet = _sheetPages[_pageChangesBuffer[2].PageNumber];
         }
 
 #if DUMP

@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<instrumentConfig>
+    <configName>testConfig</configName>
+    <inputUsesMultiChannel>No</inputUsesMultiChannel>
+    <inputs>
+        <input>
+            <name>CASIO USB-MIDI</name>
+            <offset>0</offset>
+        </input>
+    </inputs>
+    <outputUsesMultiChannel>No</outputUsesMultiChannel>
+    <outputs>
+        <output>
+            <name>Microsoft GS Wavetable Synth</name>
+            <deviceID>0</deviceID>
+            <globalID>0</globalID>
+        </output>
+    </outputs>
+</instrumentConfig>

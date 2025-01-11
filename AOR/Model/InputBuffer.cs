@@ -45,6 +45,7 @@ namespace AOR.Model
              if (result)
              {
                  line.EndTime = timestamp;
+                 line.EndTimeFloat = timestamp;
                  _notesInProgress.Remove(tone);
                  EndTimestamp = timestamp;
 #if DUMP
@@ -73,7 +74,6 @@ namespace AOR.Model
                  if (noteOn)
                  {
                      NoteLine newNoteLine = new NoteLine(tone, timestamp, 0);
-                     //if (UserBuffer.Count >= UserBufferSize) UserBuffer.RemoveAt(0);
                      for (int i = 0; i < UserBuffer.Count - UserBufferSize; i++)
                      {
                          if (UserBuffer[i].EndTime < UserBuffer[UserBuffer.Count - UserBufferSize].StartTime)
@@ -95,11 +95,11 @@ namespace AOR.Model
             ticks /= Stopwatch.Frequency / TickResolution;
             if (on)
             {
-                Console.WriteLine(@"Received Note On event. Tone: " + tone + @" | DeltaTime: " + ticks);
+                //Console.WriteLine(@"Received Note On event. Tone: " + tone + @" | DeltaTime: " + ticks);
             }
             else
             {
-                Console.WriteLine(@"Received Note Off event. Tone: " + tone + @" | DeltaTime: " + ticks);
+                //Console.WriteLine(@"Received Note Off event. Tone: " + tone + @" | DeltaTime: " + ticks);
             }
             BufferInput(tone, (uint)ticks, on);
         }

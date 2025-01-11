@@ -35,7 +35,9 @@ namespace AOR.Model
         public Playback SimulatedInput;
         private short _simulationDivision = 128;
         private const double Speed = 1.0f;
-        
+
+        public int InputCount => _inputDevices.Count;
+
 #if TEST
         public string SimulationName;
         public long SimulationTime;
@@ -244,6 +246,7 @@ namespace AOR.Model
             return output;
         }
 
+        public bool ConfigLoaded = false;
         public void LoadDeviceConfig(string path)
         {
             XDocument document;
@@ -295,7 +298,7 @@ namespace AOR.Model
                             XElement channelsElement = inputDevice.Element("channels");
                             if(channelsElement == null) return;
                             var channels = channelsElement.Elements("channel");
-                            InputDeviceData newInputDevice = new InputDeviceData(inputName, 0, true);
+                            InputDeviceData newInputDevice = new InputDeviceData(0, true);
                             _inputsOffsets.Add(inputName,newInputDevice);
                             foreach (XElement channel in channels)
                             {
@@ -313,7 +316,7 @@ namespace AOR.Model
                             XElement offsetElement = inputDevice.Element("offset");
                             if(offsetElement is null) return;
                             int offset = int.Parse(offsetElement.Value); 
-                            _inputsOffsets.Add(inputName,new InputDeviceData(inputName,offset,false));
+                            _inputsOffsets.Add(inputName,new InputDeviceData(offset,false));
                         }
                     }
                     else
@@ -322,7 +325,7 @@ namespace AOR.Model
                     }
                 }
             }
-            
+            ConfigLoaded = true;
             XElement outputs = root.Element("outputs");
             if(outputs is null || !outputs.HasElements) return;
             var outputDevices = outputs.Elements("output");
@@ -332,7 +335,6 @@ namespace AOR.Model
             {
                 _outputDevices.Add(null);
             }
-            
             foreach (XElement outputDevice in xElements)
             {
                 string outputName = outputDevice.Element("name")?.Value;

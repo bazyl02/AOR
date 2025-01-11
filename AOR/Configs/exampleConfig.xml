@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<instrumentConfig>
+    <configName>exampleConfig</configName>
+    <inputUsesMultiChannel>No</inputUsesMultiChannel>
+    <inputs>
+        <input>
+            <name>Organ Output</name>
+            <offset>0</offset>
+        </input>
+    </inputs>
+    <outputUsesMultiChannel>No</outputUsesMultiChannel>
+    <outputs>
+        <output>
+            <name>Organ Input</name>
+            <deviceID>0</deviceID>
+            <globalID>0</globalID>
+        </output>
+    </outputs>
+</instrumentConfig>

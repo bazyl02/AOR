@@ -108,6 +108,7 @@
         <Compile Include="View\Controls\SongList.xaml.cs">
           <DependentUpon>SongList.xaml</DependentUpon>
         </Compile>
+        <Compile Include="View\HalfConverter.cs" />
         <Page Include="MainWindow.xaml">
             <Generator>MSBuild:Compile</Generator>
             <SubType>Designer</SubType>
@@ -155,10 +156,13 @@
       <Folder Include="Sheets\" />
     </ItemGroup>
     <ItemGroup>
+      <Content Include="Configs\example2Config.xml" />
+      <Content Include="Configs\exampleConfig.xml" />
       <Content Include="Configs\melodyConfig.xml" />
       <Content Include="Configs\melodyConfig2.xml" />
       <Content Include="Configs\organConfig.xml" />
       <Content Include="Configs\testConfig.xml" />
+      <Content Include="Configs\testConfig2.xml" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>
     <Import Project="..\packages\Melanchall.DryWetMidi.7.2.0\build\Melanchall.DryWetMidi.targets" Condition="Exists('..\packages\Melanchall.DryWetMidi.7.2.0\build\Melanchall.DryWetMidi.targets')" />

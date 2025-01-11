@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<instrumentConfig>
+    <configName>example2Config</configName>
+    <inputUsesMultiChannel>Yes</inputUsesMultiChannel>
+    <inputs>
+        <input>
+            <name>Organ Output</name>
+            <channels>
+                <channel>
+                    <id>0</id>
+                    <offset>0</offset>
+                </channel>
+                <channel>
+                    <id>1</id>
+                    <offset>1</offset>
+                </channel>
+                <channel>
+                    <id>5</id>
+                    <offset>2</offset>
+                </channel>
+            </channels>
+        </input>
+    </inputs>
+    <outputUsesMultiChannel>Yes</outputUsesMultiChannel>
+    <outputs>
+        <output>
+            <name>Organ Input</name>
+            <deviceID>0</deviceID>
+            <channels>
+                <channel>
+                    <channelID>0</channelID>
+                    <globalID>0</globalID>
+                </channel>
+                <channel>
+                    <channelID>2</channelID>
+                    <globalID>1</globalID>
+                </channel>
+            </channels>
+        </output>
+    </outputs>
+</instrumentConfig>
