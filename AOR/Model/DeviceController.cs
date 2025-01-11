@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Windows;
 using AOR.ModelView;
 using System.Xml.Linq;
 using Melanchall.DryWetMidi.Common;
@@ -321,7 +322,9 @@ namespace AOR.Model
                     }
                     else
                     {
-                        throw new InvalidDataException("Couldn't find the device: " + inputName);
+                        MessageBox.Show("MIDI input device '" + inputName + "' not found! Check if the device is properly connected and if it's correctly defined in config file.", "Error!",
+                            MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
                     }
                 }
             }
@@ -338,7 +341,6 @@ namespace AOR.Model
             foreach (XElement outputDevice in xElements)
             {
                 string outputName = outputDevice.Element("name")?.Value;
-                Console.WriteLine(outputName);
                 if (outputName != null && outputNames.Contains(outputName))
                 {
                     OutputDevice outputDev = OutputDevice.GetByName(outputName);
@@ -370,6 +372,12 @@ namespace AOR.Model
                         int globalId = int.Parse(globalIdElement.Value);
                         _outputsData.Add(globalId,new ChannelIdLink(false,id,-1));
                     }
+                }
+                else
+                {
+                    MessageBox.Show("MIDI output device '" + outputName + "' not found! Check if the device is properly connected and if it's correctly defined in config file.", "Error!",
+                        MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
                 }
             }
         }

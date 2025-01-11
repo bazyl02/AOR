@@ -21,7 +21,7 @@ namespace AOR.View.Controls
                     ? Bindings.GetInstance().DeviceController.SimulatedInput == null
                     : Bindings.GetInstance().DeviceController.InputCount == 0))
             {
-                MessageBox.Show("Either output device, selected piece or " + (Bindings.GetInstance().FromFile ? "simulation input" : "input device") + " is missing!","Error!",MessageBoxButton.OK,MessageBoxImage.Error);
+                MessageBox.Show("Either instrument config or selected piece is missing!","Error!",MessageBoxButton.OK,MessageBoxImage.Error);
                 return;
             }
 
