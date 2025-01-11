@@ -162,6 +162,7 @@
       <Content Include="Configs\melodyConfig2.xml" />
       <Content Include="Configs\organConfig.xml" />
       <Content Include="Configs\testConfig.xml" />
+      <Content Include="Configs\testConfig2.xml" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>
     <Import Project="..\packages\Melanchall.DryWetMidi.7.2.0\build\Melanchall.DryWetMidi.targets" Condition="Exists('..\packages\Melanchall.DryWetMidi.7.2.0\build\Melanchall.DryWetMidi.targets')" />

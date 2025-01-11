@@ -24,6 +24,12 @@ namespace AOR.View.Controls
                 MessageBox.Show("Either output device, selected piece or " + (Bindings.GetInstance().FromFile ? "simulation input" : "input device") + " is missing!","Error!",MessageBoxButton.OK,MessageBoxImage.Error);
                 return;
             }
+
+            if (Bindings.GetInstance().SheetWindow != null)
+            {
+                Bindings.GetInstance().SheetWindow.Close();
+                Bindings.GetInstance().SheetWindow = null;
+            }
             SheetWindow win2 = new SheetWindow();
             Bindings.GetInstance().InputBuffer.Clear();
             Bindings.GetInstance().ProcessSelectedPiece(); 
