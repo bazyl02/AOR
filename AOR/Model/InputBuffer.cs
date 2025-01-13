@@ -61,7 +61,8 @@ namespace AOR.Model
 #endif
 #if TEST
                      long simTime = Bindings.GetInstance().DeviceController.SimulationTime;
-                     Bindings.GetInstance().TestResult.WriteLine("Simulation Time: " + simTime + " | Predicted Time: " + runResult + " | Difference: " + (runResult - simTime));
+                     //SimTime|PredTime|Diff
+                     Bindings.GetInstance().TestResult.WriteLine(simTime + "|" + runResult + "|" + (runResult - simTime));
 #endif
                  }
                  Console.WriteLine(@"----------------------------------------------");
