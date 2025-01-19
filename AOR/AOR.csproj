@@ -111,6 +111,12 @@
         <Compile Include="View\Controls\SongList.xaml.cs">
           <DependentUpon>SongList.xaml</DependentUpon>
         </Compile>
+        <Compile Include="View\Controls\StartButton.xaml.cs">
+          <DependentUpon>StartButton.xaml</DependentUpon>
+        </Compile>
+        <Compile Include="View\Controls\TestingStart.xaml.cs">
+          <DependentUpon>TestingStart.xaml</DependentUpon>
+        </Compile>
         <Compile Include="View\HalfConverter.cs" />
         <Page Include="MainWindow.xaml">
             <Generator>MSBuild:Compile</Generator>
@@ -135,6 +141,8 @@
         <Page Include="View\Controls\PlaybackControls.xaml" />
         <Page Include="View\Controls\SimulatedInputFileDropDown.xaml" />
         <Page Include="View\Controls\SongList.xaml" />
+        <Page Include="View\Controls\StartButton.xaml" />
+        <Page Include="View\Controls\TestingStart.xaml" />
     </ItemGroup>
     <ItemGroup>
         <Compile Include="Properties\AssemblyInfo.cs">

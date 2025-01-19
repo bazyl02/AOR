@@ -269,6 +269,8 @@ namespace AOR.Model
             _outputDevices.Clear();
             _inputsOffsets.Clear();
             _outputsData.Clear();
+
+            Bindings.GetInstance().LoadedConfigName = root.Element("configName")?.Value;
             
             XElement inputs = root.Element("inputs");
             if(inputs is null || !inputs.HasElements) return;

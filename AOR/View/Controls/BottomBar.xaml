@@ -7,25 +7,29 @@
              mc:Ignorable="d"
              d:DesignHeight="75" d:DesignWidth="700">
     
-    <Grid Background="Aquamarine">
+    <Grid Background="#A5A5A3">
         <Grid.RowDefinitions>
             <RowDefinition Height="1*"/>
+            <RowDefinition Height="2.5*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="0.1*"/>
             <ColumnDefinition Width="1*"/>
-            <ColumnDefinition Width="0.75*"/>
-            <ColumnDefinition Width="1.25*"/>
-            <ColumnDefinition Width="1*"/>
-            <ColumnDefinition Width="0.1*"/>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="300"/>
         </Grid.ColumnDefinitions>
         
+        <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" Text="Loaded Config"/>
+        <Rectangle Fill="#E0E0E3" Stroke="Black"  Grid.Column="0" Grid.Row="1"></Rectangle>
+        <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{Binding LoadedConfigName}"/>
         
-        <local:OpenMidiFileDialog Grid.Row="0" Grid.Column="1" x:Name="FileDialog"/>
+        <TextBlock Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Text="Selected Piece"/>
+        <Rectangle Fill="#E0E0E3" Stroke="Black"  Grid.Column="1" Grid.Row="1"></Rectangle>
+        <TextBlock Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{Binding SelectedPiece}"/>
         
-        <TextBlock Grid.Row="0" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" Text="Selected piece:"/>
-        <TextBlock Grid.Row="0" Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{Binding SelectedPiece}"/>
-        <Button Grid.Column="4" Content="Start" Click="ButtonBase_OnClick"/>
+        <!--<Button Visibility="{Binding FromFileInvisible}" Grid.Row="0" Grid.Column="2" Grid.RowSpan="2" Content="Start" Click="ButtonBase_OnClick"/>-->
+        <local:StartButton Grid.Row="0" Grid.Column="2" Grid.RowSpan="2" Visibility="{Binding FromFileInvisible}"></local:StartButton>
+        
+        <local:TestingStart Grid.Column="2" Grid.RowSpan="2" Grid.Row="0" Visibility="{Binding FromFileVisible}"></local:TestingStart>
     </Grid>
     
 </UserControl>

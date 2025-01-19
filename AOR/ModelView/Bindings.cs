@@ -64,7 +64,19 @@ namespace AOR.ModelView
             get => _fromFileVisible;
             set
             {
+                FromFileInvisible = _fromFileVisible;
                 _fromFileVisible = value;
+                OnPropertyChanged();
+            }
+        }
+        private Visibility _fromFileInvisible = Visibility.Visible;
+        
+        public Visibility FromFileInvisible
+        {
+            get => _fromFileInvisible;
+            set
+            {
+                _fromFileInvisible = value;
                 OnPropertyChanged();
             }
         }
@@ -77,6 +89,18 @@ namespace AOR.ModelView
             set
             {
                 _selectedPiece = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _loadedConfigName = null;
+
+        public string LoadedConfigName
+        {
+            get => _loadedConfigName;
+            set
+            {
+                _loadedConfigName = value;
                 OnPropertyChanged();
             }
         }

@@ -7,6 +7,6 @@
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
-        <Button Name="OpenFile" Content="Open MIDI File" Click="OpenFile_OnClick"></Button>
+        <Button Background="#C7C7D3" Name="OpenFile" Content="Open MIDI File" Click="OpenFile_OnClick"></Button>
     </Grid>
 </UserControl>
