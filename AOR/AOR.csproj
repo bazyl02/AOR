@@ -96,6 +96,9 @@
         <Compile Include="View\Controls\DropDownOutput.xaml.cs">
           <DependentUpon>DropDownOutput.xaml</DependentUpon>
         </Compile>
+        <Compile Include="View\Controls\LoadBar.xaml.cs">
+          <DependentUpon>LoadBar.xaml</DependentUpon>
+        </Compile>
         <Compile Include="View\Controls\OpenMidiFileDialog.xaml.cs">
           <DependentUpon>OpenMidiFileDialog.xaml</DependentUpon>
         </Compile>
@@ -127,6 +130,7 @@
         <Page Include="View\Controls\DeviceBar.xaml" />
         <Page Include="View\Controls\DropDown.xaml" />
         <Page Include="View\Controls\DropDownOutput.xaml" />
+        <Page Include="View\Controls\LoadBar.xaml" />
         <Page Include="View\Controls\OpenMidiFileDialog.xaml" />
         <Page Include="View\Controls\PlaybackControls.xaml" />
         <Page Include="View\Controls\SimulatedInputFileDropDown.xaml" />
