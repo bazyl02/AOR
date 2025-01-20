@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
 using AOR.Model;
@@ -64,7 +65,7 @@ namespace AOR.ModelView
             get => _fromFileVisible;
             set
             {
-                FromFileInvisible = _fromFileVisible;
+                if(_fromFileVisible != value)FromFileInvisible = _fromFileVisible;
                 _fromFileVisible = value;
                 OnPropertyChanged();
             }

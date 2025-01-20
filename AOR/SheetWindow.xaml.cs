@@ -20,7 +20,7 @@ namespace AOR
 
         public async Task WaitForChange(double currentValue = 0)
         {
-            while (Math.Abs(SlidingSheet.ActualWidth - currentValue) < 0.0001f)
+            while (Math.Abs(SlidingSheet.ActualWidth - currentValue) < 0.0001f && SlidingSheet.Source != null)
             {
                 await Task.Delay(25);
             }
@@ -45,7 +45,6 @@ namespace AOR
             MainSheet.RenderTransform = transform;
             TranslateTransform transform2 = new TranslateTransform(0,0);
             MainSheet2.RenderTransform = transform2;
-            
             //-(MainSheet2.ActualWidth == 0 ? ActualWidth : MainSheet2.ActualWidth)
         }
         

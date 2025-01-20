@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <instrumentConfig>
-    <configName>testConfig</configName>
+    <configName>testConfig2</configName>
     <inputUsesMultiChannel>No</inputUsesMultiChannel>
     <inputs>
         <input>
