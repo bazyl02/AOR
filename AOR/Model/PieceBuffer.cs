@@ -453,6 +453,18 @@ namespace AOR.Model
             if(_pageChangesBuffer.Count > 0 && _sheetPages.Count > 0) Bindings.GetInstance().CurrentSheet = _sheetPages[_pageChangesBuffer[0].PageNumber];
             if(_pageChangesBuffer.Count > 1 &&_sheetPages.Count > 1) Bindings.GetInstance().CurrentSheet2 = _sheetPages[_pageChangesBuffer[1].PageNumber];
             if(_pageChangesBuffer.Count > 2 &&_sheetPages.Count > 2) Bindings.GetInstance().NewSheet = _sheetPages[_pageChangesBuffer[2].PageNumber];
+            
+            if (_pageChangesBuffer.Count == 0)
+            {
+                if (_sheetPages.Count >= 1)
+                {
+                    Bindings.GetInstance().CurrentSheet = _sheetPages[0];
+                }
+                if(_sheetPages.Count >= 2)
+                {
+                    Bindings.GetInstance().CurrentSheet2 = _sheetPages[1];
+                }
+            }
         }
 
 #if DUMP
