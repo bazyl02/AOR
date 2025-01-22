@@ -12,23 +12,21 @@
     
     <Grid Background="Bisque" Margin="0 0 0 0 ">
         <Grid.RowDefinitions>
+            <RowDefinition Height="25"/>
             <RowDefinition Height="1*"/>
-            <RowDefinition Height="0.12*"/>
+            <RowDefinition Height="65"/>
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*"/>
-            <ColumnDefinition Width="0.25*"/> 
-        </Grid.ColumnDefinitions>
+
+        <customControls:LoadBar Grid.Row="0"></customControls:LoadBar>
         
+        <customControls:SongList x:Name="MainList" Grid.Row="1" Grid.Column="0"/>
         
-        <customControls:SongList x:Name="MainList" Grid.Row="0" Grid.Column="0"/>
-        
-        <Rectangle Grid.Row="0" Grid.Column="0" Fill="Black" VerticalAlignment="Stretch" HorizontalAlignment="Right" Width="2"></Rectangle>
-        <Rectangle Grid.Row="0" Grid.Column="0" Fill="Black" VerticalAlignment="Stretch" HorizontalAlignment="Left" Width="2"></Rectangle>
-        <Rectangle Grid.Row="0" Grid.Column="0" Fill="Black" VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="2"></Rectangle>
-        <Rectangle Grid.Row="0" Grid.Column="0" Fill="Black" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Height="2"></Rectangle>
-        <customControls:DeviceBar Grid.Row="0" Grid.Column="1" Grid.RowSpan="2"></customControls:DeviceBar>
-        <customControls:BottomBar Grid.Row="1" Grid.Column="0"></customControls:BottomBar>
+        <Rectangle Grid.Row="1" Fill="Black" VerticalAlignment="Stretch" HorizontalAlignment="Right" Width="3"></Rectangle>
+        <Rectangle Grid.Row="1" Fill="Black" VerticalAlignment="Stretch" HorizontalAlignment="Left" Width="3"></Rectangle>
+        <Rectangle Grid.Row="1" Fill="Black" VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="3"></Rectangle>
+        <Rectangle Grid.Row="1" Fill="Black" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Height="3"></Rectangle>
+
+        <customControls:BottomBar Grid.Row="2" Grid.ColumnSpan="2"></customControls:BottomBar>
     </Grid>
     
     

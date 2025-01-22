@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
 using AOR.Model;
@@ -64,7 +65,19 @@ namespace AOR.ModelView
             get => _fromFileVisible;
             set
             {
+                if(_fromFileVisible != value)FromFileInvisible = _fromFileVisible;
                 _fromFileVisible = value;
+                OnPropertyChanged();
+            }
+        }
+        private Visibility _fromFileInvisible = Visibility.Visible;
+        
+        public Visibility FromFileInvisible
+        {
+            get => _fromFileInvisible;
+            set
+            {
+                _fromFileInvisible = value;
                 OnPropertyChanged();
             }
         }
@@ -77,6 +90,18 @@ namespace AOR.ModelView
             set
             {
                 _selectedPiece = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _loadedConfigName = null;
+
+        public string LoadedConfigName
+        {
+            get => _loadedConfigName;
+            set
+            {
+                _loadedConfigName = value;
                 OnPropertyChanged();
             }
         }

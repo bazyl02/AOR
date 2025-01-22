@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Windows;
 using AOR.ModelView;
@@ -82,7 +81,9 @@ namespace AOR.Model
                 .OrderBy(e => e.Time);
             var tempoMap = track.GetTempoMap();
             SimulatedInput = new Playback(timedEvents, tempoMap, _simulationSoundOutput);
+#if TEST
             SimulationName = name;
+#endif
             _simulationDivision = ((TicksPerQuarterNoteTimeDivision)track.TimeDivision).TicksPerQuarterNote;
             SimulatedInput.Speed = Speed;
             SimulatedInput.EventPlayed += OnEventPlayed;
@@ -269,6 +270,8 @@ namespace AOR.Model
             _outputDevices.Clear();
             _inputsOffsets.Clear();
             _outputsData.Clear();
+
+            Bindings.GetInstance().LoadedConfigName = root.Element("configName")?.Value;
             
             XElement inputs = root.Element("inputs");
             if(inputs is null || !inputs.HasElements) return;
