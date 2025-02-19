@@ -173,7 +173,7 @@ namespace AOR.ModelView
         {
             if(SelectedPiece is null) return;
             PieceBuffer = new PieceBuffer(SelectedPiece.MidiFile, SelectedPiece.Config);
-            await PieceBuffer.LoadPdfPages(SelectedPiece.PdfDocument);
+            if(SelectedPiece.PdfDocument != null)await PieceBuffer.LoadPdfPages(SelectedPiece.PdfDocument);
         }
     }
 }

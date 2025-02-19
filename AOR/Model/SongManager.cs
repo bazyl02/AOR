@@ -43,7 +43,7 @@ namespace AOR.Model
                         config = XDocument.Load(entry.Open());
                     }
                 }
-                if (file is null || document is null) return;
+                if (file is null) return;
                 PieceData newPiece = new PieceData(file,document,config,path);
                 if (!Pieces.Contains(newPiece))
                 {

@@ -176,6 +176,7 @@ namespace AOR.Model
                     double divider = (tempo / (_simulationDivision * 1.0d)) / InputBuffer.TickResolution * 1.0d;
                     long time = (long)Math.Round(noteOffEvent.DeltaTime * divider);
                     _globalRealTime += time;
+                    _globalRealTime = (long)playback.GetCurrentTime<MetricTimeSpan>().TotalMilliseconds;
                     Console.WriteLine(@"Simulated input time: " + _globalRealTime);
 #if DUMP
                     Bindings.GetInstance().Report.WriteLine("Simulated input time: " + _globalRealTime);
