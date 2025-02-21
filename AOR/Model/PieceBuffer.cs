@@ -11,6 +11,7 @@ using System.Xml.Linq;
 using Windows.Data.Pdf;
 using Windows.Storage.Streams;
 using AOR.ModelView;
+using Melanchall.DryWetMidi.Common;
 
 namespace AOR.Model
 {
@@ -121,8 +122,13 @@ namespace AOR.Model
                 if (chunk.ChunkId == "MTrk")
                 {
                     Console.WriteLine(@"Chunk no. " + index);
-                    if (!configData.TryGetValue(index, out TrackData trackData)) continue;
                     TrackChunk trackChunk = (TrackChunk)chunk;
+                    Console.WriteLine("Truck: " + index + " | Event count:" + trackChunk.Events.Count);
+                    if (!configData.TryGetValue(index, out TrackData trackData))
+                    {
+                        index++;
+                        continue;
+                    }
                     long globalMidiTrackTime = 0;
                     uint globalTrackTime = 0;
                     var events = trackChunk.Events;
@@ -173,10 +179,15 @@ namespace AOR.Model
                                         }
                                         case Usage.Registers:
                                         {
-                                            if (trackData.RegisterFormat == RegisterFormat.Note)
-                                            {
-                                                _registrantsChangesBuffer.Add(new MidiEventData(midiEvent,globalTrackTime,trackData.Data));
-                                            }
+                                            //TODO: Look over this case
+                                            ProgramChangeEvent programChangeEvent =
+                                                new ProgramChangeEvent((SevenBitNumber)65);
+                                            programChangeEvent.Channel = castEvent.Channel;
+                                            _registrantsChangesBuffer.Add(new MidiEventData(programChangeEvent,globalTrackTime,trackData.Data));
+                                            //if (trackData.RegisterFormat == RegisterFormat.Note)
+                                            //{
+                                            //    _registrantsChangesBuffer.Add(new MidiEventData(midiEvent,globalTrackTime,trackData.Data));
+                                            //}
                                             break;
                                         }
                                         case Usage.Pages:

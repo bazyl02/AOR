@@ -45,6 +45,10 @@ namespace AOR.Model
         
         public void SendToOutput(MidiEventData data)
         {
+            //ProgramChangeEvent pr = new ProgramChangeEvent(new SevenBitNumber(3));
+            //pr.Channel = new FourBitNumber(15);
+            //_outputDevices[0].SendEvent(pr);
+            //return;
             if (!_outputsData.TryGetValue(data.GlobalId, out ChannelIdLink encoding)) return;
             switch (data.Event.EventType)
             {
@@ -296,6 +300,7 @@ namespace AOR.Model
                     if (inputNames.Contains(inputName))
                     {
                         InputDevice inputDev = InputDevice.GetByName(inputName);
+                        inputDev.StartEventsListening();
                         inputDev.EventReceived += OnEventReceived;
                         _inputDevices.Add(inputDev);
                         if (inputMultiChannel)
@@ -310,7 +315,7 @@ namespace AOR.Model
                                 XElement idElement = channel.Element("id");
                                 if(idElement == null) return;
                                 int channelId = int.Parse(idElement.Value); 
-                                XElement offsetElement = inputDevice.Element("offset");
+                                XElement offsetElement = channel.Element("offset");
                                 if(offsetElement is null) return;
                                 int offset = int.Parse(offsetElement.Value); 
                                 newInputDevice.ChannelsOffsets.Add(channelId,offset);

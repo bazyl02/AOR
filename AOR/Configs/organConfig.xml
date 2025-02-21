@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <instrumentConfig>
-    <configName>testConfig</configName>
+    <configName>Organ Config</configName>
     <inputUsesMultiChannel>Yes</inputUsesMultiChannel>
     <inputs>
         <input>
-            <name>???</name>
+            <name>MIDISPORT 2x2 In A</name>
             <channels>
                 <channel>
                     <id>0</id>
@@ -21,20 +21,17 @@
             </channels>
         </input>
     </inputs>
-    <outputUsesMultiChannel>No</outputUsesMultiChannel>
+    <outputUsesMultiChannel>Yes</outputUsesMultiChannel>
     <outputs>
         <output>
-            <name>Microsoft GS Wavetable Synth</name>
+            <name>MIDISPORT 2x2 Out A</name>
             <deviceID>0</deviceID>
-            <globalID>0</globalID>
-            <!--
             <channels>
                 <channel>
-                    <channelID>0</channelID>
+                    <channelID>15</channelID>
                     <globalID>0</globalID>
                 </channel>
             </channels>
-            -->
         </output>
     </outputs>
 </instrumentConfig>

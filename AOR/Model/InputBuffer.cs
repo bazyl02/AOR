@@ -8,7 +8,7 @@ namespace AOR.Model
 {
     public class InputBuffer
     {
-        public const int UserBufferSize = 20;
+        public const int UserBufferSize = 30;
         public const long TickResolution = 1000;
         public const int MinimumBufferSize = 10;
         

@@ -137,7 +137,7 @@ namespace AOR.Model
                 Console.WriteLine(@"Ratio: " + _highestRatios[i] + @" | Index: " + _highestRatioIndices[i]);
 #endif
 #if DUMP
-                Bindings.GetInstance().Report.WriteLine("Ratio: " + _highestRatios[i] + " | Index: " + _highestRatioIndices[i]);
+                Bindings.GetInstance().Report.WriteLine("Ratio: " + _highestRatios[i,highestIndex] + " | Index: " + _highestRatioIndices[i,highestIndex]);
 #endif
             }
             
