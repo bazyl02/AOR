@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<melodyConfig>
+    <tracks>
+        <track>
+            <trackID>3</trackID>
+            <usesMultiChannel>No</usesMultiChannel>
+            <use>Melody</use>
+            <offset>2</offset>
+        </track>
+        <track>
+            <trackID>1</trackID>
+            <usesMultiChannel>No</usesMultiChannel>
+            <use>Melody</use>
+            <offset>1</offset>
+        </track>
+        <track>
+            <trackID>2</trackID>
+            <usesMultiChannel>No</usesMultiChannel>
+            <use>Melody</use>
+            <offset>0</offset>
+        </track>
+        <track>
+            <trackID>4</trackID>
+            <usesMultiChannel>No</usesMultiChannel>
+            <use>Registers</use>
+            <registerFormat>Note</registerFormat>
+            <globalID>0</globalID>
+        </track>
+        <track>
+            <trackID>5</trackID>
+            <usesMultiChannel>No</usesMultiChannel>
+            <use>Pages</use>
+        </track>
+    </tracks>
+</melodyConfig>

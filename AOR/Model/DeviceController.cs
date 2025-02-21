@@ -42,13 +42,20 @@ namespace AOR.Model
         public string SimulationName;
         public long SimulationTime;
 #endif
-        
+        private bool isThree = true;
         public void SendToOutput(MidiEventData data)
         {
-            //ProgramChangeEvent pr = new ProgramChangeEvent(new SevenBitNumber(3));
-            //pr.Channel = new FourBitNumber(15);
-            //_outputDevices[0].SendEvent(pr);
-            //return;
+            if (data.Event.EventType == MidiEventType.NoteOn)
+            {
+                ProgramChangeEvent pr = new ProgramChangeEvent(new SevenBitNumber((byte)(isThree ? 3 : 2)));
+                isThree = !isThree;
+                pr.Channel = new FourBitNumber(15);
+                //Console.WriteLine("Channel:" + pr.Channel + " | Program: " + pr.ProgramNumber + "isThree: " + isThree);
+                _outputDevices[0].SendEvent(pr);
+                return;
+            }
+            return;
+            
             if (!_outputsData.TryGetValue(data.GlobalId, out ChannelIdLink encoding)) return;
             switch (data.Event.EventType)
             {
