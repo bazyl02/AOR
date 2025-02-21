@@ -179,15 +179,10 @@ namespace AOR.Model
                                         }
                                         case Usage.Registers:
                                         {
-                                            //TODO: Look over this case
-                                            ProgramChangeEvent programChangeEvent =
-                                                new ProgramChangeEvent((SevenBitNumber)65);
-                                            programChangeEvent.Channel = castEvent.Channel;
-                                            _registrantsChangesBuffer.Add(new MidiEventData(programChangeEvent,globalTrackTime,trackData.Data));
-                                            //if (trackData.RegisterFormat == RegisterFormat.Note)
-                                            //{
-                                            //    _registrantsChangesBuffer.Add(new MidiEventData(midiEvent,globalTrackTime,trackData.Data));
-                                            //}
+                                            if (trackData.RegisterFormat == RegisterFormat.Note)
+                                            {
+                                                _registrantsChangesBuffer.Add(new MidiEventData(midiEvent,globalTrackTime,trackData.Data));
+                                            }
                                             break;
                                         }
                                         case Usage.Pages:
